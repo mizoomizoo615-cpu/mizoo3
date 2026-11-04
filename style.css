@@ -1383,3 +1383,23 @@ div.pimg{height:176px!important;background:linear-gradient(145deg,#f7e6d6,#e9cdb
 .fvglc{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none}
 .fvcvw.gl{background:radial-gradient(ellipse at 50% 42%,#fffefb 0%,#e9ddcf 90%);border-radius:inherit}
 .fvcvw.gl canvas.fvcv{position:relative;z-index:1;background:transparent!important}
+
+/* ===== ستوديو التصميم الحر ===== */
+.fvst{position:fixed;inset:0;z-index:9999;background:rgba(20,12,6,.55);display:flex;align-items:center;justify-content:center;padding:2vh 2vw}
+.fvst-box{background:#fffdf8;border-radius:18px;width:min(1280px,96vw);height:min(860px,94vh);display:flex;flex-direction:column;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);overflow:hidden}
+.fvst-hd{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:#fbf1d6}
+.fvst-hd .hint{flex:1;margin:0}
+.fvst-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(300px,360px) 1fr}
+.fvst-side{overflow-y:auto;padding:10px 14px;border-inline-end:1px solid var(--line)}
+.fvst-main{display:flex;flex-direction:column;min-width:0;padding:8px}
+.fvst-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.fvst-cv{flex:1;min-height:200px;width:100%;border:1px solid var(--line);border-radius:12px;background:#fbf7ef;cursor:crosshair}
+.fvst .stn{display:flex;flex-direction:column;gap:3px;font-size:.82rem;font-weight:700;margin-top:6px}
+.fvst .stn input[type=number],.fvst .stn input[type=text]{width:100%;min-height:34px}
+.fvst .stg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fvst .stc{display:flex;align-items:center;gap:6px;font-size:.82rem;margin-top:6px}
+@media(max-width:860px){.fvst-body{grid-template-columns:1fr;grid-template-rows:auto 1fr}.fvst-side{max-height:42vh;border-inline-end:0;border-bottom:1px solid var(--line)}}
+.cpc{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:8px;background:#fffdf8}
+.cpc .stg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cpc .stn{display:flex;flex-direction:column;gap:2px;font-size:.78rem;font-weight:700;margin-top:6px}
+.cpc .stn input{width:100%;min-height:32px}
