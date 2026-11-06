@@ -2924,8 +2924,14 @@ function bayEditor(k,d,name){
   if(cov!==n)h+='<p class="hint" style="color:#b3261e;font-weight:700">⚠ التقسيمات تغطي '+cov+' من '+n+' أبواب. عدّل «يشمل» أو أضف تقسيمًا أو اضغط «توزيع تلقائي» ليتطابق العدد (سيُرسم المقطع الداخلي نسبيًا على أي حال).</p>';
   return h+'<div class="bar" style="margin-top:6px"><button class="btn ghost sm" type="button" data-a="byadd" data-sk="'+k+'">+ إضافة تقسيم</button><button class="btn gold sm" type="button" data-a="byauto2" data-sk="'+k+'">توزيع تلقائي (كل بابين)</button><button class="btn ghost sm" type="button" data-a="byauto1" data-sk="'+k+'">تقسيم لكل باب</button><button class="btn ghost sm" type="button" data-a="byclr" data-sk="'+k+'">إلغاء التقسيم المخصص</button></div></div>';
 }
+function dresserSecCard(k,d){
+  var hs=dsHolders(d),n=hs.filter(function(a){return d.dsecs&&d.dsecs[a[0]];}).length;
+  return '<div class="dsc" style="margin-top:12px"><b>تخصيص القسم</b> <span class="hint">— قسّم أدراج التسريحة والملحق الجانبي حسب طلب العميل: عدد الأدراج وارتفاع كل درج، رفوف، أعمدة، وقوالب جاهزة</span>'+
+    '<div class="bar" style="margin-top:6px;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn gold sm" data-a="opentab" data-sk="'+k+'">🗂️ فتح تخصيص القسم في المجسم</button><span class="hint">'+(hs.length?(n?('مخصَّص حاليًا: '+n+' من '+hs.length+' أقسام'):'التقسيم تلقائي حاليًا'):'التصميم الحالي بلا أدراج — يمكنك إضافة وحدة تقسيم')+'</span></div></div>';
+}
 function secEditor(k,d,name){
-  var t=ftype(d,name);if(!hasInt(t))return '';
+  var t=ftype(d,name);if(t===FT[9])return dresserSecCard(k,d);
+  if(!hasInt(t))return '';
   if(t!==FT[1])return secEditor0(k,d,name);
   var be=bayEditor(k,d,name);
   return (d.bays&&d.bays.length)?be:be+secEditor0(k,d,name);
@@ -5004,7 +5010,7 @@ function fvBuild(S,st){
   if(drc)drc.m='wood';if(hdc)hdc.m='metal';
   var C={w:F,wi:fvMix(F,[255,255,255],0.16),dk:fvSh(F,0.7),mt:hdc||[182,146,76],rd:[182,146,76],dw:drc||F,dwi:fvMix(drc||F,[255,255,255],0.16),bs:bsc||hdc||fvSh(F,0.7),fr:bsc||[38,36,38],hs:oo.hs||'v',gt:gl.t||'',gp:gl.pos||'mid',gn:parseInt(gl.n,10)||2,gl:[176,218,230],fa:((st.set&&(t===FT[7]||t===FT[8]))?fvSh(F,1.05):[200,206,212]),ma:[240,238,232],pl:[252,252,250],tv:[26,28,32]};
   C.mt.m='metal';C.rd.m='metal';C.fa.m='fabric';C.ma.m='fabric';C.pl.m='fabric';
-  C.sds=oo.sds||'none';C.hbw=oo.hbw||'n';C.mirc=oo.mirc||null;C.dtp=oo.dtp||'none';C.dth=fvN(oo.dth,40);C.mdx=fvN(oo.mdx,0);C.mdz=fvN(oo.mdz,0);C.msc=fvN(oo.msc,100);C.sdx=fvN(oo.sdx,0);C.sdy=fvN(oo.sdy,0);C.wsh=oo.wsh||'0';C.wshx=fvN(oo.wshx,0);C.wshz=fvN(oo.wshz,0);C.lgc=(oo.dlg==='gold')?(function(){var g=[201,164,58];g.m='metal';return g;})():(oo.dlg==='black'?[38,36,34]:null);C.rm=0;C.mir=oo.mir||'rect';C.ns=oo.ns||'rect';C.bst=oo.bst||'legs';C.hbs=oo.hbs||'flat';C.hbd=oo.hbd||'none';C.hbn=parseInt(oo.hbn,10)||3;C.ups=oo.ups||'none';C.up=fvHex(oo.upc)||[196,182,168];C.up.m='fabric';C.dl=oo.dl||'std';C.dsd=oo.dsd||'r';C.dax=oo.dax||'none';C.dxs=oo.dxs||'l';C.dst=oo.dst||'none';C.sf=(oo.sf&&oo.sf.on&&(t===FT[1]||t===FT[3]))?oo.sf:null;C.dt=(t===FT[1]||t===FT[3])?(oo.dt||'swing'):'swing';
+  C.sds=oo.sds||'none';C.hbw=oo.hbw||'n';C.mirc=oo.mirc||null;C.dsecs=oo.dsecs||null;C.dtp=oo.dtp||'none';C.dth=fvN(oo.dth,40);C.mdx=fvN(oo.mdx,0);C.mdz=fvN(oo.mdz,0);C.msc=fvN(oo.msc,100);C.sdx=fvN(oo.sdx,0);C.sdy=fvN(oo.sdy,0);C.wsh=oo.wsh||'0';C.wshx=fvN(oo.wshx,0);C.wshz=fvN(oo.wshz,0);C.lgc=(oo.dlg==='gold')?(function(){var g=[201,164,58];g.m='metal';return g;})():(oo.dlg==='black'?[38,36,34]:null);C.rm=0;C.mir=oo.mir||'rect';C.ns=oo.ns||'rect';C.bst=oo.bst||'legs';C.hbs=oo.hbs||'flat';C.hbd=oo.hbd||'none';C.hbn=parseInt(oo.hbn,10)||3;C.ups=oo.ups||'none';C.up=fvHex(oo.upc)||[196,182,168];C.up.m='fabric';C.dl=oo.dl||'std';C.dsd=oo.dsd||'r';C.dax=oo.dax||'none';C.dxs=oo.dxs||'l';C.dst=oo.dst||'none';C.sf=(oo.sf&&oo.sf.on&&(t===FT[1]||t===FT[3]))?oo.sf:null;C.dt=(t===FT[1]||t===FT[3])?(oo.dt||'swing'):'swing';
   C.dsm=oo.dsm||'mid';C.dsl=oo.dsl||null;var lt0=oo.lt||{};C.gd=lt0.gd||{};C.LC=lt0.on?{c:fvHex(lt0.c)||[255,208,138],p:lt0.p||[]}:null;
   if(oo.nobody){}
   else if(t===FT[0])fvB(a,0,0,0,L,W,H,C.w);
@@ -5080,31 +5086,48 @@ function fvBuild(S,st){
 }
 function fvDresserBody(a,L,W,H,nd,C,open){
   var dl=C.dl||'std',bh=dl==='std'?H*0.5:Math.min(78,H*0.55),tt=2.5,dwid,right,tk,legc=C.lgc||C.w,i,lgs=Math.max(3,Math.min(L,W)*0.06);
-  function blk(x0,wd2,n2){var t=[];fvCab(t,wd2,W,bh-tt,{secs:[{k:'drawers',n:n2||nd}],base:0,skin:true},C,open);fvShift(t,x0,0,0);fvPush(a,t);}
+  function mainSecs(def){return (C.dsecs&&C.dsecs.main)||def;}
+  function blk(x0,wd2,n2,key){var t=[],sc=(C.dsecs&&C.dsecs[key])||[{k:'drawers',n:n2||nd}];fvCab(t,wd2,W,bh-tt,{secs:sc,base:0,skin:true},C,open);fvShift(t,x0,0,0);fvPush(a,t);}
   function topDrawer(x0,wd2){if(wd2<22)return;var t=[];fvCab(t,wd2,W,12,{secs:[{k:'drawers',n:1}],base:0,skin:true},C,open);fvShift(t,x0,0,bh-tt-12);fvPush(a,t);}
   function leg(x,y){fvB(a,x,y,0,lgs,lgs,bh-tt,legc);}
-  if(dl==='std')fvCab(a,L,W,bh,{secs:[{k:'drawers',n:nd}],base:0,skin:true},C,open);
-  else if(dl==='commode')fvCab(a,L,W,bh,{secs:[{k:'drawers',n:nd},{k:'drawers',n:nd}],base:Math.min(12,bh*0.15),legs:true,skin:true},C,open);
+  if(dl==='std')fvCab(a,L,W,bh,{secs:mainSecs([{k:'drawers',n:nd}]),base:0,skin:true},C,open);
+  else if(dl==='commode')fvCab(a,L,W,bh,{secs:mainSecs([{k:'drawers',n:nd},{k:'drawers',n:nd}]),base:Math.min(12,bh*0.15),legs:true,skin:true},C,open);
   else if(dl==='float'||dl==='float2'||dl==='shelf'){
     var dh=Math.min(24,bh*0.32),zb=bh-tt-dh,t2=[],rr=W/2,lb=dl==='float'?L-rr:L;
-    fvCab(t2,lb,W,dh,{secs:dl==='shelf'?[{k:'drawers',n:1}]:[{k:'drawers',n:1},{k:'drawers',n:1}],base:0,skin:true},C,open);
+    fvCab(t2,lb,W,dh,{secs:mainSecs(dl==='shelf'?[{k:'drawers',n:1}]:[{k:'drawers',n:1},{k:'drawers',n:1}]),base:0,skin:true},C,open);
     fvShift(t2,0,0,zb);fvPush(a,t2);
     fvB(a,0,0,bh-tt,lb,W,tt,C.w);
     if(dl==='float'){
       var pts=[],q;for(q=0;q<=18;q++){var th=-Math.PI/2+q/18*Math.PI;pts.push([lb+rr*Math.cos(th),W/2+rr*Math.sin(th)]);}
       fvPrism(a,'z',pts,bh-tt,bh,C.w,{sm:true});
     }
+  }else if(dl==='ledge'){
+    var ld=Math.min(W,32);fvB(a,0,W-ld,bh-3.5,L,ld,3.5,C.w);
+  }else if(dl==='console'){
+    fvB(a,0,0,bh-tt,L,W,tt,C.w);leg(0,0);leg(L-lgs,0);leg(0,W-lgs);leg(L-lgs,W-lgs);fvB(a,lgs,lgs,bh*0.24,L-2*lgs,W-2*lgs,2,C.wi);
+  }else if(dl==='drawerleg'){
+    var dh5=Math.min(18,bh*0.26),t5=[];
+    fvB(a,0,0,bh-tt,L,W,tt,C.w);
+    fvCab(t5,L-2*lgs,W,dh5,{secs:mainSecs([{k:'drawers',n:1}]),base:0,skin:true},C,open);fvShift(t5,lgs,0,bh-tt-dh5);fvPush(a,t5);
+    leg(0,0);leg(L-lgs,0);leg(0,W-lgs);leg(L-lgs,W-lgs);
+  }else if(dl==='curvedesk'){
+    var rr2=W/2,lb2=L-rr2,dh6=Math.min(18,bh*0.26),t6=[],pq,pts6=[];
+    fvB(a,0,0,bh-tt,lb2,W,tt,C.w);
+    for(pq=0;pq<=18;pq++){var th6=-Math.PI/2+pq/18*Math.PI;pts6.push([lb2+rr2*Math.cos(th6),W/2+rr2*Math.sin(th6)]);}
+    fvPrism(a,'z',pts6,bh-tt,bh,C.w,{sm:true});
+    fvCab(t6,lb2-lgs,W,dh6,{secs:mainSecs([{k:'drawers',n:1}]),base:0,skin:true},C,open);fvShift(t6,0,0,bh-tt-dh6);fvPush(a,t6);
+    leg(0,0);leg(0,W-lgs);fvB(a,lb2+rr2*0.35-lgs/2,W/2-lgs/2,0,lgs,lgs,bh-tt,legc);
   }else{
     fvB(a,0,0,bh-tt,L,W,tt,C.w);
     dwid=Math.min(Math.max(28,L*0.3),46);
     if(dl==='knee2'||dl==='classic'||dl==='hollywood'){
       var n5=dl==='hollywood'?Math.max(5,nd):nd;
-      dwid=Math.max(20,Math.min(dwid,(L-48)/2));blk(0,dwid,n5);blk(L-dwid,dwid,n5);
+      dwid=Math.max(20,Math.min(dwid,(L-48)/2));blk(0,dwid,n5,'L');blk(L-dwid,dwid,n5,'R');
       fvB(a,dwid,W-1.8,bh-tt-14,L-2*dwid,1.8,14,C.w);
       if(dl!=='knee2')topDrawer(dwid,L-2*dwid);
     }else if(dl==='knee'||dl==='kneeleg'){
       dwid=Math.max(20,Math.min(dwid,L-48));right=(C.dsd||'r')==='r';tk=Math.max(1.6,Math.min(3,L*0.02));
-      blk(right?L-dwid:0,dwid);
+      blk(right?L-dwid:0,dwid,null,'P');
       if(dl==='knee')fvB(a,right?0:L-tk,0,0,tk,W,bh-tt,C.w);
       else{var lx=right?0:L-lgs;leg(lx,0);leg(lx,W-lgs);topDrawer(right?0:dwid,L-dwid);}
       fvB(a,right?tk:dwid,W-1.8,bh-tt-14,L-dwid-tk,1.8,14,C.w);
@@ -5170,17 +5193,18 @@ function fvDresser(a,L,W,H,nd,C,open){
   tmp=[];fvDresserBody(tmp,Lt,W,H,nd,C,open);fvTagFrom(tmp,0,'المرآة');fvShift(tmp,xo,0,0);fvPush(a,tmp);
   if(ax!=='none'){
     var ax0=xo?0:Lt,Ht,kk;tmp=[];
-    if(ax==='tower'){Ht=Math.min(H*0.85,130);fvCab(tmp,aw,W,Ht,{secs:[{k:'drawers',n:Math.max(4,Math.round(Ht/22))}],base:0,skin:true},C,open);}
-    else if(ax==='cab'){Ht=Math.min(H*0.85,140);fvCab(tmp,aw,W,Ht,{secs:[{k:'shelves',n:3}],base:0,skin:true},C,open);fvDoors(tmp,0,aw,0,0.3,Ht-0.3,1,open,C);}
+    var accS=function(def){return (C.dsecs&&C.dsecs.acc)||def;};
+    if(ax==='tower'){Ht=Math.min(H*0.85,130);fvCab(tmp,aw,W,Ht,{secs:accS([{k:'drawers',n:Math.max(4,Math.round(Ht/22))}]),base:0,skin:true},C,open);}
+    else if(ax==='cab'){Ht=Math.min(H*0.85,140);fvCab(tmp,aw,W,Ht,{secs:accS([{k:'shelves',n:3}]),base:0,skin:true},C,open);fvDoors(tmp,0,aw,0,0.3,Ht-0.3,1,open,C);}
     else if(ax==='glass'){
-      Ht=Math.min(H*0.95,190);fvCab(tmp,aw,W,Ht,{secs:[{k:'shelves',n:5}],base:0,skin:true},C,open);
+      Ht=Math.min(H*0.95,190);fvCab(tmp,aw,W,Ht,{secs:accS([{k:'shelves',n:5}]),base:0,skin:true},C,open);
       var fr=1.6,gcol=[24,22,20];
       fvB(tmp,0,-1.4,0,fr,1.4,Ht,gcol);fvB(tmp,aw-fr,-1.4,0,fr,1.4,Ht,gcol);fvB(tmp,0,-1.4,0,aw,1.4,fr,gcol);fvB(tmp,0,-1.4,Ht-fr,aw,1.4,fr,gcol);
       fvB(tmp,fr,-0.9,fr,aw-2*fr,0.6,Ht-2*fr,[200,226,234],{al:0.28});
       for(kk=1;kk<=5;kk++)fvB(tmp,2,2,Ht*kk/6,aw-4,1,0.8,[255,214,150],{em:1,lt:{r:14,a:0.34,vis:''}});
     }
     else if(ax==='curve'){Ht=Math.min(H*0.95,190);fvCurveUnit(tmp,aw,W,Ht,C);}
-    else{Ht=Math.min(H*0.9,150);fvCab(tmp,aw,W,Ht,{secs:[{k:'shelves',n:4}],base:0,skin:true},C,open);}
+    else{Ht=Math.min(H*0.9,150);fvCab(tmp,aw,W,Ht,{secs:accS([{k:'shelves',n:4}]),base:0,skin:true},C,open);}
     fvTagFrom(tmp,0,'الملحق الجانبي');fvShift(tmp,ax0,0,0);fvPush(a,tmp);
     var tpk=C.dtp||'none';
     if(tpk!=='none'){
@@ -5521,10 +5545,61 @@ function fvMoveDrag(st,d,dsx,dsy,vertical){
   if(Math.abs(det)<1e-5)return;
   fvApplyMove(d,st.mvd.part,(dsx*ay1-dsy*ay0)/det,(ax0*dsy-ax1*dsx)/det,0);
 }
-var MODTPL={tp_shelf:{n:'رفوف',secs:[{k:'shelves',w:'',n:4,m:''}]},tp_hang:{n:'شماعة + رفوف',secs:[{k:'hang',w:'',n:1,m:''},{k:'shelves',w:'',n:4,m:''}]},tp_drw:{n:'أدراج',secs:[{k:'drawers',w:'',n:4,m:''}]},tp_3:{n:'رفوف | أدراج | رفوف',secs:[{k:'shelves',w:'',n:4,m:''},{k:'drawers',w:'',n:4,m:''},{k:'shelves',w:'',n:4,m:''}]},tp_hang2:{n:'شماعتان',secs:[{k:'hang2',w:'',n:1,m:''}]},tp_combo:{n:'رفوف + أدراج سفلية',secs:[{k:'combo',w:'',n:3,m:2}]},tp_mix:{n:'تقسيم مخصص (رفوف + أدراج)',secs:[{k:'mix',w:'',parts:[{p:'shelves',n:2,h:''},{p:'drawers',n:2,h:''}]}]}};
+var MODTPL={tp_shelf:{n:'رفوف',secs:[{k:'shelves',w:'',n:4,m:''}]},tp_hang:{n:'شماعة + رفوف',secs:[{k:'hang',w:'',n:1,m:''},{k:'shelves',w:'',n:4,m:''}]},tp_drw:{n:'أدراج',secs:[{k:'drawers',w:'',n:4,m:''}]},tp_3:{n:'رفوف | أدراج | رفوف',secs:[{k:'shelves',w:'',n:4,m:''},{k:'drawers',w:'',n:4,m:''},{k:'shelves',w:'',n:4,m:''}]},tp_hang2:{n:'شماعتان',secs:[{k:'hang2',w:'',n:1,m:''}]},tp_combo:{n:'رفوف + أدراج سفلية',secs:[{k:'combo',w:'',n:3,m:2}]},tp_drwv:{n:'أدراج بأحجام مختلفة',secs:[{k:'mix',w:'',parts:[{p:'drawers',n:1,h:12},{p:'drawers',n:1,h:18},{p:'drawers',n:1,h:30}]}]},tp_mix:{n:'تقسيم مخصص (رفوف + أدراج)',secs:[{k:'mix',w:'',parts:[{p:'shelves',n:2,h:''},{p:'drawers',n:2,h:''}]}]}};
 var MODK={shelves:'رفوف',hang:'شماعة',hang2:'شماعتان',drawers:'أدراج',combo:'رفوف + أدراج',empty:'فراغ',mix:'تقسيم مخصص'};
 function modNew(d,n){
   return {id:fvNewId('m'),n:'وحدة '+(n+1),L:60,W:40,H:80,x:0,y:0,z:0,base:0,legs:false,doors:0,on:true,secs:[{k:'shelves',w:'',n:4,m:''}]};
+}
+function fvSecHolder(d,id){
+  var i;
+  if(id.indexOf('sec_')===0){var k=id.slice(4);return (d.dsecs&&d.dsecs[k])?{secs:d.dsecs[k],_k:k}:null;}
+  for(i=0;i<(d.mods||[]).length;i++)if(d.mods[i].id===id)return d.mods[i];
+  return null;
+}
+function fvDsDefault(d,key){
+  var nd=Math.max(1,fdef(FT[9],d,num(d.l)).drawers||3),dl=d.dl||'std',D=function(n){return {k:'drawers',w:'',n:n,m:''};};
+  if(key==='acc'){var ax=d.dax||'none';return ax==='tower'?[D(5)]:ax==='shelf'?[{k:'shelves',w:'',n:4,m:''}]:ax==='glass'?[{k:'shelves',w:'',n:5,m:''}]:[{k:'shelves',w:'',n:3,m:''}];}
+  if(key==='main'){
+    if(dl==='commode')return [D(nd),D(nd)];
+    if(dl==='float'||dl==='float2')return [D(1),D(1)];
+    if(dl==='shelf'||dl==='drawerleg'||dl==='curvedesk')return [D(1)];
+  }
+  return [D(nd)];
+}
+function dsHolders(d){
+  var dl=d.dl||'std',a=[];
+  if(dl==='knee2'||dl==='classic'||dl==='hollywood'){a.push(['L','أدراج الجانب الأيسر (كما في الرسم)']);a.push(['R','أدراج الجانب الأيمن']);}
+  else if(dl==='knee'||dl==='kneeleg')a.push(['P','أدراج الجانب']);
+  else if(['std','commode','float','float2','shelf','drawerleg','curvedesk'].indexOf(dl)>-1)a.push(['main','أدراج الجسم']);
+  if(d.dax&&['tower','cab','shelf','glass'].indexOf(d.dax)>-1)a.push(['acc','تقسيم الملحق الجانبي']);
+  return a;
+}
+function fvSecEditHtml(id,secs){
+  return sub('قوالب جاهزة للتقسيم','<div class="chips">'+Object.keys(MODTPL).map(function(k){return '<button type="button" class="chip" data-x="mod" data-v="'+id+':tpl:'+k+'">'+MODTPL[k].n+'</button>';}).join('')+'</div>')+
+    sub('الأقسام (من اليسار إلى اليمين)',(secs||[]).map(function(sc,i){
+      var k=sc.k||'shelves',sf=function(f,lab){return '<label class="stn"><span>'+lab+'</span><input type="number" step="1" data-mod="'+id+'" data-ms="'+i+'" data-mf="'+f+'" value="'+esc(sc[f]==null?'':sc[f])+'"></label>';};
+      var bt=function(op,lab,arg){return '<button type="button" class="chip" data-x="mod" data-v="'+id+':'+op+':'+i+(arg!=null?':'+arg:'')+'">'+lab+'</button>';};
+      var hh='<div class="mset"><div class="bar" style="gap:6px;align-items:center;flex-wrap:wrap"><b>قسم '+(i+1)+'</b>'+bt('sup','↑')+bt('sdn','↓')+bt('sdup','⧉')+bt('sdel','×')+'</div>'+
+        '<div class="chips">'+Object.keys(MODK).map(function(kk){return '<button type="button" class="chip'+(kk===k?' on':'')+'" data-x="mod" data-v="'+id+':sk:'+i+':'+kk+'">'+MODK[kk]+'</button>';}).join('')+'</div>'+
+        '<div class="stg">'+(k==='shelves'||k==='drawers'||k==='combo'?sf('n',k==='drawers'?'عدد الأدراج':'عدد الرفوف'):'')+(k==='combo'?sf('m','عدد الأدراج'):'')+sf('w','العرض سم (فارغ=تلقائي)')+'</div>';
+      if(k==='mix')hh+=(sc.parts||[]).map(function(pt,j){
+        var pa='data-mod="'+id+'" data-ms="'+i+'" data-mp="'+j+'"',pk=pt.p||'shelves';
+        return '<div class="bar" style="gap:6px;margin:4px 0;align-items:center;flex-wrap:wrap"><span>جزء '+(j+1)+'</span><select '+pa+' data-mf="p" style="width:140px">'+MIXK.map(function(x){return '<option value="'+x[0]+'"'+(x[0]===pk?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select>'+
+          ((pk==='hang'||pk==='empty')?'':'<input type="number" '+pa+' data-mf="n" value="'+esc(pt.n==null?'':pt.n)+'" placeholder="العدد" style="width:80px">')+
+          '<input type="number" '+pa+' data-mf="h" value="'+esc(pt.h==null?'':pt.h)+'" placeholder="الارتفاع سم" style="width:110px">'+
+          '<button type="button" class="chip" data-x="mod" data-v="'+id+':pup:'+i+':'+j+'">↑</button><button type="button" class="chip" data-x="mod" data-v="'+id+':pdn:'+i+':'+j+'">↓</button><button type="button" class="chip" data-x="mod" data-v="'+id+':pdel:'+i+':'+j+'">×</button></div>';
+      }).join('')+'<button type="button" class="chip" data-x="mod" data-v="'+id+':padd:'+i+'">+ إضافة جزء</button>';
+      return hh+'</div>';
+    }).join('')+'<button type="button" class="chip" data-x="mod" data-v="'+id+':sadd">+ إضافة قسم</button>');
+}
+function dsHtml(d){
+  var hs=dsHolders(d),h='<p class="hint">قسّم الأدراج والملحق الجانبي كما يطلب العميل: غيّر عدد الأدراج وارتفاع كل درج (جزء بارتفاع محدد)، أو اجعل القسم رفوفًا أو شماعة أو تقسيمًا مخصصًا، وقسّم الجانب إلى عدة أعمدة.</p>';
+  if(!hs.length)h+='<p class="hint">التصميم الحالي لا يحتوي أدراجًا أو ملحقًا قابلًا للتقسيم. اختر تصميمًا بأدراج، أو أضف ملحقًا جانبيًا، أو أضف وحدة تقسيم مخصصة:</p><div class="chips"><button type="button" class="chip" data-x="modnew">➕ إضافة وحدة تقسيم</button></div>';
+  hs.forEach(function(a){
+    var on=d.dsecs&&d.dsecs[a[0]];
+    h+='<div class="cpc"><div class="bar" style="gap:6px;align-items:center;flex-wrap:wrap"><b>'+a[1]+'</b><button type="button" class="chip'+(on?' on':'')+'" data-x="dsec" data-v="'+a[0]+':'+(on?'off':'on')+'">'+(on?'↺ إلغاء التخصيص (تلقائي)':'✏ تخصيص التقسيم')+'</button></div>'+(on?fvSecEditHtml('sec_'+a[0],d.dsecs[a[0]]):'<span class="hint">التقسيم تلقائي حاليًا</span>')+'</div>';
+  });
+  return h;
 }
 function modHtml(d){
   var list=d.mods||[],h='<div class="chips"><button type="button" class="chip" data-x="modnew">➕ إضافة وحدة تقسيم</button><button type="button" class="chip'+(d.nobody?' on':'')+'" data-x="nobody" aria-pressed="'+(d.nobody?'true':'false')+'">'+(d.nobody?'✔ ':'')+'إخفاء الجسم الأصلي للصنف</button></div>';
@@ -5534,23 +5609,7 @@ function modHtml(d){
     var mk=function(op,lab,on){return '<button type="button" class="chip'+(on?' on':'')+'" data-x="mod" data-v="'+id+':'+op+'">'+lab+'</button>';};
     h+='<div class="cpc"><div class="bar" style="gap:6px;align-items:center;flex-wrap:wrap"><input type="text" class="mname" data-mod="'+id+'" data-mf="n" value="'+esc(m.n||'وحدة')+'" aria-label="اسم الوحدة">'+mk('vis',m.on===false?'🚫 مخفية':'👁 ظاهرة',m.on!==false)+mk('dup','⧉ تكرار')+mk('del','🗑 حذف')+'</div>'+
       '<div class="stg">'+mf('L','العرض')+mf('W','العمق')+mf('H','الارتفاع')+mf('x','X')+mf('y','Y')+mf('z','Z')+mf('base','ارتفاع القاعدة')+mf('doors','عدد الأبواب')+'</div>'+
-      '<div class="chips">'+mk('legs','أرجل بدل القاعدة المصمتة',m.legs)+'</div>'+
-      sub('قوالب جاهزة للتقسيم','<div class="chips">'+Object.keys(MODTPL).map(function(k){return '<button type="button" class="chip" data-x="mod" data-v="'+id+':tpl:'+k+'">'+MODTPL[k].n+'</button>';}).join('')+'</div>')+
-      sub('الأقسام (من اليسار إلى اليمين)',(m.secs||[]).map(function(sc,i){
-        var k=sc.k||'shelves',sf=function(f,lab){return '<label class="stn"><span>'+lab+'</span><input type="number" step="1" data-mod="'+id+'" data-ms="'+i+'" data-mf="'+f+'" value="'+esc(sc[f]==null?'':sc[f])+'"></label>';};
-        var bt=function(op,lab,arg){return '<button type="button" class="chip" data-x="mod" data-v="'+id+':'+op+':'+i+(arg!=null?':'+arg:'')+'">'+lab+'</button>';};
-        var hh='<div class="mset"><div class="bar" style="gap:6px;align-items:center;flex-wrap:wrap"><b>قسم '+(i+1)+'</b>'+bt('sup','↑')+bt('sdn','↓')+bt('sdup','⧉')+bt('sdel','×')+'</div>'+
-          '<div class="chips">'+Object.keys(MODK).map(function(kk){return '<button type="button" class="chip'+(kk===k?' on':'')+'" data-x="mod" data-v="'+id+':sk:'+i+':'+kk+'">'+MODK[kk]+'</button>';}).join('')+'</div>'+
-          '<div class="stg">'+(k==='shelves'||k==='drawers'||k==='combo'?sf('n',k==='drawers'?'عدد الأدراج':'عدد الرفوف'):'')+(k==='combo'?sf('m','عدد الأدراج'):'')+sf('w','العرض سم (فارغ=تلقائي)')+'</div>';
-        if(k==='mix')hh+=(sc.parts||[]).map(function(pt,j){
-          var pa='data-mod="'+id+'" data-ms="'+i+'" data-mp="'+j+'"',pk=pt.p||'shelves';
-          return '<div class="bar" style="gap:6px;margin:4px 0;align-items:center;flex-wrap:wrap"><span>جزء '+(j+1)+'</span><select '+pa+' data-mf="p" style="width:140px">'+MIXK.map(function(x){return '<option value="'+x[0]+'"'+(x[0]===pk?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select>'+
-            ((pk==='hang'||pk==='empty')?'':'<input type="number" '+pa+' data-mf="n" value="'+esc(pt.n==null?'':pt.n)+'" placeholder="العدد" style="width:80px">')+
-            '<input type="number" '+pa+' data-mf="h" value="'+esc(pt.h==null?'':pt.h)+'" placeholder="الارتفاع سم" style="width:110px">'+
-            '<button type="button" class="chip" data-x="mod" data-v="'+id+':pup:'+i+':'+j+'">↑</button><button type="button" class="chip" data-x="mod" data-v="'+id+':pdn:'+i+':'+j+'">↓</button><button type="button" class="chip" data-x="mod" data-v="'+id+':pdel:'+i+':'+j+'">×</button></div>';
-        }).join('')+'<button type="button" class="chip" data-x="mod" data-v="'+id+':padd:'+i+'">+ إضافة جزء</button>';
-        return hh+'</div>';
-      }).join('')+'<button type="button" class="chip" data-x="mod" data-v="'+id+':sadd">+ إضافة قسم</button>')+'</div>';
+      '<div class="chips">'+mk('legs','أرجل بدل القاعدة المصمتة',m.legs)+'</div>'+fvSecEditHtml(id,m.secs)+'</div>';
   });
   return h;
 }
@@ -5701,7 +5760,7 @@ var HBSL={flat:'مستقيم',arch:'مقوّس',round:'نصف دائري',step:'
 var HBDL={none:'سادة',vert:'ألواح عمودية',horiz:'أحزمة أفقية',channel:'قنوات',puff:'أسطوانات منفوخة',tuft:'كابتونيه (أزرار)',tuftx:'كابتونيه كبير (شيستر)',grid:'مربعات',frame:'إطار بارز',slats:'شرائح خشب',shelf:'رفوف + كوّة'};
 var UPSL={none:'بدون تنجيد (خشب)',head:'تنجيد الرأس فقط',full:'تنجيد الرأس والأطراف (الجانبين والقدم)'};
 var UPPRE=[['بيج','#c4b6a8'],['رمادي فاتح','#bdbdbd'],['رمادي غامق','#6d6f73'],['كحلي','#2f3e5c'],['أخضر زيتي','#6b7550'],['عنابي','#6e2a3a'],['وردي باهت','#d9b8bd'],['أسود','#2c2c2e'],['أبيض','#f0ede6']];
-var DLL={std:'أدراج أسفل المرآة (عادي)',knee:'مكان للكرسي + أدراج على جانب واحد',kneeleg:'أدراج على جانب + أرجل على الجانب الآخر',knee2:'مكان للكرسي + أدراج على الجانبين',classic:'كلاسيك: أدراج على الجانبين + درج علوي',hollywood:'هوليوود: خمسة أدراج على كل جانب',commode:'كومودينو بستة أدراج',float:'معلّقة بطرف دائري',float2:'معلّقة بدرجين (طرف مستقيم)',shelf:'رف تسريحة معلّق بدرج',open:'طاولة مفتوحة بدون أدراج'};
+var DLL={std:'أدراج أسفل المرآة (عادي)',knee:'مكان للكرسي + أدراج على جانب واحد',kneeleg:'أدراج على جانب + أرجل على الجانب الآخر',knee2:'مكان للكرسي + أدراج على الجانبين',classic:'كلاسيك: أدراج على الجانبين + درج علوي',hollywood:'هوليوود: خمسة أدراج على كل جانب',commode:'كومودينو بستة أدراج',float:'معلّقة بطرف دائري',float2:'معلّقة بدرجين (طرف مستقيم)',curvedesk:'طاولة بطرف دائري على أرجل + درج',drawerleg:'طاولة بدرج علوي على أرجل',console:'كونسول بأرجل ورف سفلي',ledge:'رف مكياج معلّق رفيع',shelf:'رف تسريحة معلّق بدرج',open:'طاولة مفتوحة بدون أدراج'};
 var DSIDE={r:'اليمين',l:'اليسار'};
 var DAXL={none:'بدون ملحق',tower:'برج أدراج طويل',cab:'خزانة بباب',shelf:'رفوف مفتوحة',glass:'وحدة زجاجية مضيئة',curve:'رفوف منحنية مضيئة'};
 var DTPL={none:'بدون ملحق علوي',cab:'خزانة علوية بباب',shelf:'رف علوي مفتوح',glass:'علوية زجاجية مضيئة',ceil:'لوح حتى السقف'};
@@ -5804,8 +5863,8 @@ function sub(t,body){return '<div class="fvsub"><span>'+t+'</span>'+body+'</div>
 function fvN(v,def){var x=parseFloat(v);return isNaN(x)?def:x;}
 var DRS0={mdx:0,mdz:0,msc:100,sdx:0,sdy:0,wsh:'0',wshx:0,wshz:0,dax:'none',dst:'none',dlg:'wood',dxs:'l',dsd:'r',dtp:'none',dth:40};
 function drsPre(o){var r={};Object.keys(DRS0).forEach(function(k){r[k]=DRS0[k];});Object.keys(o).forEach(function(k){r[k]=o[k];});return r;}
-var DRSPREL={ds_side:'بأدراج جانبية',ds_float:'معلّقة بطرف دائري',ds_shelf:'رف تسريحة معلّق',ds_classic:'كلاسيك بأدراج على الجانبين',ds_tall:'وحدة طولية ورفوف مضيئة',ds_holly:'هوليوود بلمبات',ds_commode:'كومودينو ومرآة',ds_lux:'معلّقة + رفوف منحنية + علوية'};
-var DRSPRE={ds_side:drsPre({dl:'kneeleg',mir:'round',dst:'pouf',dlg:'gold'}),ds_float:drsPre({dl:'float',mir:'pill'}),ds_shelf:drsPre({dl:'shelf',mir:'blob'}),ds_classic:drsPre({dl:'classic',mir:'ledframe',dst:'pouf'}),ds_tall:drsPre({dl:'kneeleg',mir:'round',dst:'pouf',dlg:'gold',dax:'shelf',dxs:'r',wsh:'2'}),ds_holly:drsPre({dl:'hollywood',mir:'holly',dst:'pouf'}),ds_commode:drsPre({dl:'commode',mir:'round'}),ds_lux:drsPre({dl:'float2',mir:'round',dax:'curve',dxs:'r',dtp:'cab',dth:40})};
+var DRSPREL={ds_side:'بأدراج جانبية',ds_float:'معلّقة بطرف دائري',ds_shelf:'رف تسريحة معلّق',ds_classic:'كلاسيك بأدراج على الجانبين',ds_tall:'وحدة طولية ورفوف مضيئة',ds_holly:'هوليوود بلمبات',ds_commode:'كومودينو ومرآة',ds_lux:'معلّقة + رفوف منحنية + علوية',ds_console:'كونسول مكياج',ds_curve:'طاولة بطرف دائري',ds_ledge:'رف مكياج معلّق'};
+var DRSPRE={ds_side:drsPre({dl:'kneeleg',mir:'round',dst:'pouf',dlg:'gold'}),ds_float:drsPre({dl:'float',mir:'pill'}),ds_shelf:drsPre({dl:'shelf',mir:'blob'}),ds_classic:drsPre({dl:'classic',mir:'ledframe',dst:'pouf'}),ds_tall:drsPre({dl:'kneeleg',mir:'round',dst:'pouf',dlg:'gold',dax:'shelf',dxs:'r',wsh:'2'}),ds_holly:drsPre({dl:'hollywood',mir:'holly',dst:'pouf'}),ds_commode:drsPre({dl:'commode',mir:'round'}),ds_lux:drsPre({dl:'float2',mir:'round',dax:'curve',dxs:'r',dtp:'cab',dth:40}),ds_console:drsPre({dl:'console',mir:'arch',dst:'pouf',dlg:'gold'}),ds_curve:drsPre({dl:'curvedesk',mir:'pill',dst:'pouf',dlg:'black'}),ds_ledge:drsPre({dl:'ledge',mir:'blob'})};
 /* ===== مكتبة أشكال المرايا المخصصة (رفع صورة ← نموذج ثلاثي الأبعاد) ===== */
 function fvMirLib(){try{return JSON.parse(localStorage.getItem('khz_mirlib')||'{}')||{};}catch(e){return {};}}
 function fvMirLibSet(o){try{localStorage.setItem('khz_mirlib',JSON.stringify(o));}catch(e){}}
@@ -6466,9 +6525,11 @@ function fvExtHtml(d,name){
     h+=csec('تصميم التسريحة',sub('الشكل العام',fvChips('dl',DLL,d.dl,'std'))+sub('جانب الأدراج',fvChips('dsd',DSIDE,d.dsd,'r'))+sub('لون الأرجل',fvChips('dlg',DLGL,d.dlg,'wood')),'«جانب الأدراج» يعمل مع تصاميم الجانب الواحد');
     h+=csec('شكل المرآة',fvChips('mir',MIRL,d.mir==='custom'?'__':d.mir,'rect',fvMirIcon)+
       (libk.length?sub('أشكال مخصصة (مرفوعة)','<div class="chips">'+libk.map(function(id){var e=lib[id];return '<button type="button" class="chip'+(curc===id?' on':'')+'" data-x="mir" data-v="cm:'+id+'" aria-pressed="'+(curc===id?'true':'false')+'">'+fvMirIcon('custom',e)+'<span>'+esc(e.n)+'</span></button>';}).join('')+'</div>'):'')+
+      (function(){var sl=fvShapeLib(),ks=Object.keys(sl);return ks.length?sub('أشكال من ستوديو التصميم الحر','<div class="chips">'+ks.map(function(id){var e=sl[id],o=e.loops.filter(function(l){return !l.hole;})[0];if(!o)return '';var mc={asp:e.asp,pts:o.pts};return '<button type="button" class="chip'+(curc==='cs'+id?' on':'')+'" data-x="mir" data-v="cs:'+id+'">'+fvMirIcon('custom',mc)+'<span>'+esc(e.n)+'</span></button>';}).join('')+'</div>'):'';})()+
       '<div class="chips"><button type="button" class="chip" data-x="mirup">➕ رفع شكل مرآة جديد</button>'+(curc?'<button type="button" class="chip" data-x="mirdel" data-v="'+curc+'">🗑 حذف هذا الشكل من المكتبة</button>':'')+'<button type="button" class="chip" data-x="mirexp">⬇ تصدير الأشكال</button><button type="button" class="chip" data-x="mirimp">⬆ استيراد أشكال</button></div>'+
       '<input type="file" accept="image/*" data-mirfile hidden><input type="file" accept="application/json,.json" data-mirjson hidden>'+
       pmove('mir','المرآة','z'),'ارفع صورة الشكل (خلفية شفافة أو لون واحد) فيتحوّل إلى نموذج ثلاثي الأبعاد');
+    h+=csec('تخصيص القسم',dsHtml(d),'قسّم الأدراج والملحق كما يطلب العميل');
     h+=csec('قطع التسريحة',sub('ملحق بجانب التسريحة (اختر «بدون ملحق» للإزالة)',fvChips('dax',DAXL,d.dax,'none')+sub('جهة الملحق',fvChips('dxs',DSIDE,d.dxs,'l')))+
       sub('ملحق علوي فوق وحدة الرفوف',fvChips('dtp',DTPL,d.dtp,'none')+'<div class="chips nudge"><button type="button" class="chip nud" data-x="nudge" data-v="top:h:5" title="رفع الارتفاع">▲ أطول</button><button type="button" class="chip nud" data-x="nudge" data-v="top:h:-5" title="خفض الارتفاع">▼ أقصر</button><button type="button" class="chip nud" data-x="nudge" data-v="top:r:0" title="إعادة">↺</button></div><span class="hint" data-nv="top">ارتفاع الملحق العلوي '+fvN(d.dth,40)+' سم'+((d.dax&&d.dax!=='none')?'':' — يتطلب اختيار ملحق جانبي أولًا')+'</span>')+
       sub('الكرسي / البوف',fvChips('dst',DSTL,d.dst,'none'))+pmove('stool','الكرسي','y')+
@@ -6659,7 +6720,7 @@ function fvMount(host,d,name){
   host._sync=syncChips;syncChips();fvExtInit(host,st,czp,kick,fire,syncChips);
   (function(){
     var tb=host.querySelector('.fvtb'),tray=host.querySelector('.fvtray'),secs=Array.prototype.slice.call(czp.querySelectorAll(':scope>.fvsec')),btns=[],key=host.dataset.sk||'',cur=FVTAB[key];
-    var IC=[[/تحريك/,'↔️'],[/وحدات/,'🧰'],[/مخصص/,'🧱'],[/قوالب/,'✨'],[/المرآة/,'🪞'],[/قطع/,'🧩'],[/هيكل/,'🛏️'],[/شكل ظهر/,'▭'],[/زخرفة/,'▦'],[/جوانب/,'◧'],[/تنجيد/,'🧵'],[/الكومدينو/,'🗄️'],[/التسريحة/,'🛋️'],[/أبواب/,'🚪'],[/الألوان/,'🎨'],[/تدرج/,'🌈'],[/خزنة/,'🔒'],[/الإضاءة/,'💡']];
+    var IC=[[/تخصيص القسم/,'🗂️'],[/تحريك/,'↔️'],[/وحدات/,'🧰'],[/مخصص/,'🧱'],[/قوالب/,'✨'],[/المرآة/,'🪞'],[/قطع/,'🧩'],[/هيكل/,'🛏️'],[/شكل ظهر/,'▭'],[/زخرفة/,'▦'],[/جوانب/,'◧'],[/تنجيد/,'🧵'],[/الكومدينو/,'🗄️'],[/التسريحة/,'🛋️'],[/أبواب/,'🚪'],[/الألوان/,'🎨'],[/تدرج/,'🌈'],[/خزنة/,'🔒'],[/الإضاءة/,'💡']];
     function ico(t){for(var q=0;q<IC.length;q++)if(IC[q][0].test(t))return IC[q][1];return '⚙️';}
     function show(i){
       cur=i;FVTAB[key]=i;
@@ -6690,8 +6751,8 @@ function fvMount(host,d,name){
   }
   czp.addEventListener('input',function(e){
     var t=e.target,d3=host._d;
-    if(t&&t.dataset&&t.dataset.mod&&d3.mods){
-      var md=d3.mods.filter(function(c){return c.id===t.dataset.mod;})[0];
+    if(t&&t.dataset&&t.dataset.mod){
+      var md=fvSecHolder(d3,t.dataset.mod);
       if(md&&t.tagName!=='SELECT'){
         var f9=t.dataset.mf,v9=t.value;
         if(t.dataset.ms!==undefined){
@@ -6710,8 +6771,8 @@ function fvMount(host,d,name){
   });
   czp.addEventListener('change',function(e){
     var t=e.target;
-    if(t&&t.tagName==='SELECT'&&t.dataset&&t.dataset.mod&&host._d.mods){
-      var md2=host._d.mods.filter(function(c){return c.id===t.dataset.mod;})[0];
+    if(t&&t.tagName==='SELECT'&&t.dataset&&t.dataset.mod){
+      var md2=fvSecHolder(host._d,t.dataset.mod);
       if(md2){var sc2=(md2.secs||[])[+t.dataset.ms];if(sc2&&sc2.parts&&sc2.parts[+t.dataset.mp])sc2.parts[+t.dataset.mp][t.dataset.mf]=t.value;kick();fire();var y6=window.scrollY;renderScope();window.scrollTo(0,y6);}
       return;
     }
@@ -6744,15 +6805,19 @@ function fvMount(host,d,name){
     if(x==='mvresetall'){d2.mv={};kick();fire();return;}
     if(x==='modnew'){d2.mods=d2.mods||[];d2.mods.push(modNew(d2,d2.mods.length));kick();fire();y=window.scrollY;renderScope();window.scrollTo(0,y);return;}
     if(x==='nobody'){d2.nobody=!d2.nobody;kick();fire();y=window.scrollY;renderScope();window.scrollTo(0,y);return;}
+    if(x==='dsec'){
+      var pk2=v.split(':'),dk=pk2[0];d2.dsecs=d2.dsecs||{};
+      if(pk2[1]==='on')d2.dsecs[dk]=JSON.parse(JSON.stringify(fvDsDefault(d2,dk)));else delete d2.dsecs[dk];
+      kick();fire();y=window.scrollY;renderScope();window.scrollTo(0,y);return;
+    }
     if(x==='mod'){
-      var pm2=v.split(':'),mid=pm2[0],mop=pm2[1],ma=pm2[2],mb2=pm2[3],ml=d2.mods||[],mi=-1,k8,tm2;
-      for(k8=0;k8<ml.length;k8++)if(ml[k8].id===mid)mi=k8;
-      if(mi<0)return;
-      var mo=ml[mi],ss=mo.secs=mo.secs||[];
-      if(mop==='vis')mo.on=(mo.on===false);
-      else if(mop==='dup'){var cl2=JSON.parse(JSON.stringify(mo));cl2.id=fvNewId('m');cl2.n=(mo.n||'وحدة')+' (نسخة)';cl2.x=fvN(mo.x,0)+fvN(mo.L,60)+5;ml.splice(mi+1,0,cl2);}
-      else if(mop==='del')ml.splice(mi,1);
-      else if(mop==='legs')mo.legs=!mo.legs;
+      var pm2=v.split(':'),mid=pm2[0],mop=pm2[1],ma=pm2[2],mb2=pm2[3],tm2,mo=fvSecHolder(d2,mid);
+      if(!mo)return;
+      var ml=d2.mods||[],mi=ml.indexOf(mo),ss=mo.secs=mo.secs||[];
+      if(mop==='vis'&&mi>-1)mo.on=(mo.on===false);
+      else if(mop==='dup'&&mi>-1){var cl2=JSON.parse(JSON.stringify(mo));cl2.id=fvNewId('m');cl2.n=(mo.n||'وحدة')+' (نسخة)';cl2.x=fvN(mo.x,0)+fvN(mo.L,60)+5;ml.splice(mi+1,0,cl2);}
+      else if(mop==='del'&&mi>-1)ml.splice(mi,1);
+      else if(mop==='legs'&&mi>-1)mo.legs=!mo.legs;
       else if(mop==='tpl'){var tp2=MODTPL[ma];if(tp2)mo.secs=JSON.parse(JSON.stringify(tp2.secs));}
       else if(mop==='sk'){var s1=ss[+ma];if(s1){s1.k=mb2;if(mb2==='mix'&&!s1.parts)s1.parts=[{p:'shelves',n:2,h:''},{p:'drawers',n:2,h:''}];}}
       else if(mop==='sadd')ss.push({k:'shelves',w:'',n:3,m:''});
@@ -6764,6 +6829,7 @@ function fvMount(host,d,name){
       else if(mop==='pdel'){var s3=ss[+ma];if(s3&&s3.parts)s3.parts.splice(+mb2,1);}
       else if(mop==='pup'){var s4=ss[+ma];if(s4&&s4.parts&&+mb2>0){tm2=s4.parts[+mb2];s4.parts[+mb2]=s4.parts[+mb2-1];s4.parts[+mb2-1]=tm2;}}
       else if(mop==='pdn'){var s5=ss[+ma];if(s5&&s5.parts&&+mb2<s5.parts.length-1){tm2=s5.parts[+mb2];s5.parts[+mb2]=s5.parts[+mb2+1];s5.parts[+mb2+1]=tm2;}}
+      if(mo._k)d2.dsecs[mo._k]=mo.secs;
       kick();fire();y=window.scrollY;renderScope();window.scrollTo(0,y);return;
     }
     if(x==='nudge'){
@@ -6805,6 +6871,11 @@ function fvMount(host,d,name){
     if(x==='mirdel'){
       var lb2=fvMirLib();delete lb2[v];fvMirLibSet(lb2);
       if(d2.mirc&&d2.mirc.id===v){d2.mir='rect';d2.mirc=null;}
+      kick();fire();y=window.scrollY;renderScope();window.scrollTo(0,y);return;
+    }
+    if(x==='mir'&&v.indexOf('cs:')===0){
+      var es=fvShapeLib()[v.slice(3)],os=es&&es.loops.filter(function(l){return !l.hole;})[0];
+      if(os){d2.mir='custom';d2.mirc={id:'cs'+v.slice(3),n:es.n,asp:es.asp,pts:os.pts};}
       kick();fire();y=window.scrollY;renderScope();window.scrollTo(0,y);return;
     }
     if(x==='mir'&&v.indexOf('cm:')===0){
@@ -6945,6 +7016,7 @@ function czPrint(d){
   if(d.mir)rows.push(['شكل المرآة',(d.mir==='custom'&&d.mirc)?('مخصص: '+d.mirc.n):(MIRL[d.mir]||'')]);
   if(d.dlg&&d.dlg!=='wood')rows.push(['لون أرجل التسريحة',DLGL[d.dlg]||'']);
   if(parseInt(d.wsh,10)>0)rows.push(['رفوف الجدار',WSHL[d.wsh]||'']);
+  if(d.dsecs&&Object.keys(d.dsecs).length)rows.push(['تقسيم الأدراج/الملحق','مخصص: '+Object.keys(d.dsecs).map(function(k){return {main:'الجسم',L:'الأيسر',R:'الأيمن',P:'الجانب',acc:'الملحق'}[k]||k;}).join('، ')]);
   if(d.dtp&&d.dtp!=='none'&&d.dax&&d.dax!=='none')rows.push(['ملحق علوي فوق الوحدة الجانبية',(DTPL[d.dtp]||'')+' — ارتفاع '+fvN(d.dth,40)+' سم']);
   if(d.ns)rows.push(['شكل الكومدينو',NSL[d.ns]||'']);
   if(d.bst)rows.push(['قاعدة السرير',BSTL[d.bst]||'']);
@@ -8163,6 +8235,11 @@ function initNew(){
     if(ac.slice(0,4)==='plan'){planAct(o,b);return;}
     if(ac==='galpick'||ac==='galrm'||ac==='galview'||ac==='galshare'){galScopeAct(o,b);return;}
     if(ac==='catpick'||ac==='catrm'||ac==='xsadd'||ac==='xsdel'){catScopeAct(o,b);return;}
+    if(ac==='opentab'){
+      var hx=$('scBody').querySelector('.fv3[data-sk="'+b.dataset.sk+'"]');
+      if(hx){if(hx._tabTo)hx._tabTo(/تخصيص القسم/);hx.scrollIntoView({behavior:'smooth',block:'center'});}
+      return;
+    }
     if(ac==='dstog'||ac==='bydoors'||ac==='byauto1'||ac==='byauto2'||ac==='byclr'||ac==='byadd'||ac==='bydel'||ac==='bycoladd'||ac==='bycoldel'||ac==='bypadd'||ac==='bypdel'||ac==='bypup'||ac==='bypdn'){bayAct(ac,b,o);return;}
     if(ac==='secadd'||ac==='secdel'||ac==='secdef'||ac==='secclr'||ac==='secmix'||ac==='secmixnew'||ac==='mixadd'||ac==='mixdel'||ac==='mixup'||ac==='mixdn'){
       var dd=getScope(o.id).items[b.dataset.sk],bx=$('scBody').querySelector('.fv3[data-sk="'+b.dataset.sk+'"]');
