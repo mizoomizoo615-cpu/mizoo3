@@ -103,9 +103,9 @@ function ordImgsHtml(o){
 }
 function ordImgsLarge(o){
   var a=o.images||[];if(!a.length)return '';
-  var n=a.length,cols=n===1?1:(n<=4?2:3),rows=Math.ceil(n/cols),mh=Math.floor(176/rows)-(rows>1?4:0);
-  return '<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:6px;margin:8px 0;page-break-after:always;break-after:page">'+
-    a.map(function(m){return '<figure style="margin:0;height:'+mh+'mm;display:flex;flex-direction:column"><img style="flex:1;min-height:0;width:100%;height:100%;object-fit:contain;background:#f6f3ef;border:1px solid #444;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.3)" src="'+m.src+'" alt="">'+(m.cap&&n>1?'<figcaption style="text-align:center">'+esc(m.cap)+'</figcaption>':'')+'</figure>';}).join('')+'</div>';
+  /* الصور تحت بعض، كل صورة تملأ عرض الصف كاملاً */
+  return '<div style="display:block;margin:8px 0">'+
+    a.map(function(m){return '<figure style="margin:0 0 10px;width:100%;break-inside:avoid;page-break-inside:avoid"><img style="display:block;width:100%;height:auto;max-height:125mm;object-fit:contain;background:#f6f3ef;border:1px solid #444;border-radius:10px" src="'+m.src+'" alt="">'+(m.cap?'<figcaption style="text-align:center;margin-top:3px">'+esc(m.cap)+'</figcaption>':'')+'</figure>';}).join('')+'</div>';
 }
 function ordImgStrip(o){
   var a=o.images||[];if(!a.length)return '';
@@ -3133,8 +3133,8 @@ function panoSection(sc){
 }
 function panoPrint(sc){
   var a=sc.pano||[];if(!a.length)return '';
-  return '<h3 style="margin:10px 0 4px">صور الطلب (بانوراما 360° / VR)</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px">'+
-    a.map(function(p){return '<figure style="margin:0;page-break-inside:avoid"><img src="'+p.src+'" alt="" style="width:100%;max-height:75mm;object-fit:contain;background:#f6f3ef;border:1px solid #444;display:block"><figcaption style="text-align:center">'+esc(p.cap||'')+(panoKind(p)==='360'?' — صورة 360° (تُعرض في العارض الإلكتروني)':'')+'</figcaption></figure>';}).join('')+'</div>';
+  return '<h3 style="margin:10px 0 4px">صور الطلب (بانوراما 360° / VR)</h3><div style="display:block;margin-bottom:10px">'+
+    a.map(function(p){return '<figure style="margin:0 0 10px;width:100%;break-inside:avoid;page-break-inside:avoid"><img src="'+p.src+'" alt="" style="width:100%;height:auto;max-height:125mm;object-fit:contain;background:#f6f3ef;border:1px solid #444;display:block"><figcaption style="text-align:center">'+esc(p.cap||'')+(panoKind(p)==='360'?' — صورة 360° (تُعرض في العارض الإلكتروني)':'')+'</figcaption></figure>';}).join('')+'</div>';
 }
 function panoRead(file,cb){
   if(!/^image\//.test(file.type)){cb(null);return;}
@@ -5698,7 +5698,7 @@ function fvMvPanel(d){
 }
 function fvPaint(ctx,w,h,S,st){
   var LT0=(st.o&&st.o.lt&&st.o.lt.on)?st.o.lt:null,NG=!!(LT0&&LT0.nt!==false&&S);
-  var REAL=st.real!==false,g,GLM=!!(st.gl&&st.glh&&window.FVTHREE&&S);
+  var LOD=st.lod||0,REAL=st.real!==false&&LOD<2,g,GLM=!!(st.gl&&st.glh&&window.FVTHREE&&S);
   if(REAL&&!NG){g=ctx.createRadialGradient(w/2,h*0.42,Math.min(w,h)*0.06,w/2,h*0.5,Math.max(w,h)*0.8);g.addColorStop(0,'#fffefb');g.addColorStop(1,'#e9ddcf');}
   else{g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,NG?'#2a2e4d':'#fbf6f0');g.addColorStop(1,NG?'#1b1e36':'#efe6dc');}
   if(GLM)ctx.clearRect(0,0,w,h);else{ctx.fillStyle=g;ctx.fillRect(0,0,w,h);}
@@ -5745,7 +5745,7 @@ function fvPaint(ctx,w,h,S,st){
   path(R.floor);ctx.fillStyle=flFill;ctx.fill();ctx.strokeStyle=NG?'#45445c':'#d3c5b4';ctx.lineWidth=1;ctx.stroke();
   if(REAL){
     ctx.save();
-    try{ctx.filter='blur('+Math.round(Math.max(6,w*0.014))+'px)';}catch(e){}
+    if(!LOD){try{ctx.filter='blur('+Math.round(Math.max(6,w*0.014))+'px)';}catch(e){}}
     path(R.shadow);ctx.fillStyle=NG?'rgba(0,0,0,0.45)':'rgba(55,34,22,0.32)';ctx.fill();
     ctx.restore();
   }else{path(R.shadow);ctx.fillStyle=NG?'rgba(0,0,0,0.4)':'rgba(60,38,28,0.2)';ctx.fill();}
@@ -5764,7 +5764,7 @@ function fvPaint(ctx,w,h,S,st){
     }else ctx.fillStyle=col;
     ctx.fill();
     if(q.al>=1){ctx.strokeStyle=col;ctx.lineWidth=0.8;ctx.stroke();}
-    if(REAL&&q.dm&&ar>520&&q.al>=1&&!q.em&&TXN<450&&(q.mt==='wood'||q.mt==='fabric')){TXN++;ctx.globalAlpha=1;fvSurf(ctx,P,q.dm,q.mt);}
+    if(REAL&&q.dm&&ar>(LOD?2400:520)&&q.al>=1&&!q.em&&TXN<(LOD?60:450)&&(q.mt==='wood'||q.mt==='fabric')){TXN++;ctx.globalAlpha=1;fvSurf(ctx,P,q.dm,q.mt);}
     if(REAL&&q.al<1&&q.al>0.05&&!q.em&&ar>300){
       gg=ctx.createLinearGradient(P[0][0],P[0][1],pe[0],pe[1]);
       gg.addColorStop(0,'rgba(255,255,255,0)');gg.addColorStop(0.36,'rgba(255,255,255,0.3)');gg.addColorStop(0.48,'rgba(255,255,255,0)');gg.addColorStop(0.6,'rgba(255,255,255,0.18)');gg.addColorStop(1,'rgba(255,255,255,0)');
@@ -7840,9 +7840,13 @@ function catScopeAct(o,b){
 }
 function catPrint(d){
   var cs=d.cat||{},rows=[];
-  function one(x){var it=catById(x.id),im=it&&it.img?'<img src="'+it.img+'" alt="" style="width:46px;height:46px;object-fit:cover;border:1px solid #999;vertical-align:middle;margin-inline-end:6px">':'';return im+esc(x.n)+(x.c&&!x.h?' ('+esc(x.c)+')':'');}
-  catSlotList(d).forEach(function(s){var v=cs[s.k];if(!v)return;var a=Array.isArray(v)?v:[v];if(a.length)rows.push([s.t,a.map(one).join('<br>')]);});
-  Object.keys(CZ_LAB).forEach(function(k){var x=(d.czs||{})[k];if(x)rows.push([CZ_LAB[k]+' (من الكاتلوج)',one(x)]);});
+  function one(x){
+    var it=catById(x.id),im=it&&it.img?'<img src="'+it.img+'" alt="" style="display:block;width:100%;height:62mm;object-fit:contain;background:#f6f3ef;border:1px solid #999;border-radius:6px">':'';
+    return '<figure style="margin:0;break-inside:avoid;page-break-inside:avoid">'+im+'<figcaption style="text-align:center;margin-top:3px;font-weight:600">'+esc(x.n)+(x.c&&!x.h?' ('+esc(x.c)+')':'')+'</figcaption></figure>';
+  }
+  function many(a){return '<div style="display:grid;grid-template-columns:repeat('+(a.length===1?1:2)+',1fr);gap:8px">'+a.map(one).join('')+'</div>';}
+  catSlotList(d).forEach(function(s){var v=cs[s.k];if(!v)return;var a=Array.isArray(v)?v:[v];if(a.length)rows.push([s.t,many(a)]);});
+  Object.keys(CZ_LAB).forEach(function(k){var x=(d.czs||{})[k];if(x)rows.push([CZ_LAB[k]+' (من الكاتلوج)',many([x])]);});
   if(!rows.length)return '';
   return '<table class="kv">'+rows.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td colspan="5">'+r[1]+'</td></tr>';}).join('')+'</table>';
 }
@@ -9095,9 +9099,20 @@ function vdIntro(c,W,H,lt,o){
   var a3=vdEo((lt-3)/.8);
   vdT(c,'المقاسات والتفاصيل والخامات',cx,cy+lh*.62+(P?116:128)+(1-a3)*14,P?26:28,VDC.goldL,'center','600',a3);
 }
+/* مستطيل أبيض بظل: يُرسم مرة واحدة في صورة مخزّنة ثم يُنسخ في كل لقطة (shadowBlur مكلف جدًا لو أُعيد رسمه 30 مرة في الثانية) */
+function vdShadowRect(c,x,y,w,h,r,color,blur,offY){
+  var sc=VD.sc||1,key=[Math.round(w*10),Math.round(h*10),r,color,blur,offY,sc].join('|'),sp=VD.sps||(VD.sps={}),e=sp[key],m=Math.ceil(blur*2+offY+4);
+  if(!e){
+    if(Object.keys(sp).length>40){VD.sps=sp={};}
+    var cv=document.createElement('canvas');cv.width=Math.ceil((w+2*m)*sc);cv.height=Math.ceil((h+2*m)*sc);
+    var g=cv.getContext('2d');g.setTransform(sc,0,0,sc,0,0);
+    g.shadowColor=color;g.shadowBlur=blur;g.shadowOffsetY=offY;g.fillStyle='#fff';vdRR(g,m,m,w,h,r);g.fill();
+    e=sp[key]={cv:cv,m:m};
+  }
+  c.drawImage(e.cv,x-e.m,y-e.m,e.cv.width/sc,e.cv.height/sc);
+}
 function vdCard(c,x,y,w,h,r){
-  c.save();c.shadowColor='rgba(90,15,17,.16)';c.shadowBlur=22;c.shadowOffsetY=8;
-  c.fillStyle='#fff';vdRR(c,x,y,w,h,r||16);c.fill();c.restore();
+  vdShadowRect(c,x,y,w,h,Math.min(r||16,w/2,h/2),'rgba(90,15,17,.16)',22,8);
   c.save();c.strokeStyle='rgba(201,154,59,.55)';c.lineWidth=1.4;vdRR(c,x,y,w,h,r||16);c.stroke();c.restore();
 }
 function vdOrder(c,W,H,lt,o,TL){
@@ -9157,11 +9172,11 @@ function vdModel(c,L,it,lt,ph){
     st.open=vdEio((lt-3.4)/1.1);
   }else st.open=0;
   st.o=it.d;
+  /* مستوى التفاصيل أثناء التشغيل: 1 = بلا تمويه ونسيج للأسطح الصغيرة، 2 = بلا تدرجات ونسيج (أسرع) — يرتفع تلقائيًا عند التأخر */
+  st.lod=(VD.play||VD.recOn)?(VD.lod||1):0;
   VD.mx.setTransform(VD.sc,0,0,VD.sc,0,0);VD.mx.clearRect(0,0,m.w,m.h);
   try{fvPaint(VD.mx,m.w,m.h,it.S,st);}catch(e){VD.mx.fillStyle='#efe6dc';VD.mx.fillRect(0,0,m.w,m.h);}
-  c.save();
-  c.shadowColor='rgba(90,15,17,.22)';c.shadowBlur=24;c.shadowOffsetY=8;c.fillStyle='#fff';vdRR(c,m.x,m.y,m.w,m.h,18);c.fill();
-  c.restore();
+  vdShadowRect(c,m.x,m.y,m.w,m.h,18,'rgba(90,15,17,.22)',24,8);
   c.save();vdRR(c,m.x,m.y,m.w,m.h,18);c.clip();c.drawImage(VD.mc,m.x,m.y,m.w,m.h);c.restore();
   c.save();c.strokeStyle=VDC.gold;c.lineWidth=2;vdRR(c,m.x,m.y,m.w,m.h,18);c.stroke();c.restore();
   c.save();c.fillStyle='rgba(90,15,17,.88)';vdRR(c,m.x+14,m.y+14,170,34,17);c.fill();c.restore();
@@ -9335,11 +9350,16 @@ function vdSize(){
   VD.W=VD.port?720:1280;VD.H=VD.port?1280:720;
   VD.cv.width=Math.round(VD.W*VD.sc);VD.cv.height=Math.round(VD.H*VD.sc);
   VD.cv.style.aspectRatio=VD.W+' / '+VD.H;
-  VD.mc=null;VD.dirty=true;
+  VD.mc=null;VD.sps=null;VD.dirty=true;
 }
 function vdTick(ts){
   VD.raf=0;if(!VD.ov)return;
-  var dt=VD.last?Math.min(.1,(ts-VD.last)/1000):0;VD.last=ts;
+  var raw=VD.last?(ts-VD.last):0,dt=VD.last?Math.min(.1,raw/1000):0;VD.last=ts;
+  if(VD.play&&raw>0){
+    /* قياس زمن اللقطات: إن كان المتوسط أبطأ من ~30 لقطة/ث نخفّض تفاصيل رسم المجسم أثناء الحركة */
+    VD.fe=VD.fe?VD.fe*0.88+Math.min(raw,120)*0.12:raw;VD.fn=(VD.fn||0)+1;
+    if(VD.fn>=18&&VD.fe>34&&(VD.lod||1)<2&&!VD.recOn){VD.lod=2;VD.fn=0;VD.fe=0;}
+  }
   if(VD.play){
     VD.t+=dt;VD.dirty=true;
     if(VD.t>=VD.tl.total){VD.t=VD.tl.total-.001;VD.play=false;if(VD.recOn)setTimeout(vdRecStop,350);}
@@ -9419,7 +9439,7 @@ function vdClose(){
   if(VD.recOn){if(!confirm('التسجيل جارٍ. هل تريد إيقافه وإغلاق النافذة؟'))return;VD.recOn=false;try{VD.rec.onstop=null;vdRecStop();}catch(e){}}
   VD.play=false;VD.file=null;if(VD.raf)cancelAnimationFrame(VD.raf);VD.raf=0;
   if(VD.keyH)document.removeEventListener('keydown',VD.keyH);
-  if(VD.ov)VD.ov.remove();VD.ov=null;VD.cv=null;VD.ctx=null;VD.mc=null;VD.sc=1;
+  if(VD.ov)VD.ov.remove();VD.ov=null;VD.cv=null;VD.ctx=null;VD.mc=null;VD.sps=null;VD.sc=1;
   document.documentElement.style.overflow='';
 }
 function vdCss(){
@@ -9445,7 +9465,7 @@ function vdOpen(o){
   var sc=scopes[o.id],anyDim=us.some(function(u){var d=sc&&sc.items&&sc.items[scKey(u)];return d&&num(d.l)>0&&num(d.w)>0&&num(d.h)>0||parseSize(u.p?u.p.size:u.l.size);});
   if(!anyDim)toast('أدخل أبعاد الأصناف أولًا ليظهر المجسم داخل الفيديو');
   vdCss();vdLogoImg();
-  VD.sc=1;VD.o=o;VD.tl=vdBuild(o);VD.t=0;VD.play=true;VD.last=0;VD.dirty=true;VD.recOn=false;
+  VD.sc=1;VD.lod=1;VD.fe=0;VD.fn=0;VD.o=o;VD.tl=vdBuild(o);VD.t=0;VD.play=true;VD.last=0;VD.dirty=true;VD.recOn=false;
   VD.tl.S.forEach(function(s){if(s.it){s.it.mats.forEach(function(m){m.items.forEach(function(q){vdImg(q.img);});});}});
   var ov=document.createElement('div');ov.className='vdov';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','فيديو عرض تفاصيل الطلب');
   ov.innerHTML='<div class="vdtop"><span>🎬 فيديو عرض الطلب — '+esc(o.orderNo||'')+' ('+esc(o.custName||'')+')</span><button type="button" class="vdb" id="vdClose" aria-label="إغلاق">✕ إغلاق</button></div>'+
