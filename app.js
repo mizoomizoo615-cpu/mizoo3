@@ -2382,6 +2382,11 @@ var SCI={
  dresser:'<circle cx="24" cy="11" r="6"/><path d="M10 40V28a14 14 0 0 1 28 0v12M10 32h28M10 40h28"/>',
  night:'<rect x="9" y="8" width="30" height="32" rx="3"/><path d="M9 24h30M20 16h8M20 32h8"/>',
  shelf:'<path d="M8 6v36M40 6v36M8 14h32M8 24h32M8 34h32M8 6h32M8 42h32"/>',
+ shoe:'<rect x="9" y="5" width="30" height="38" rx="3"/><path d="M9 17h30M9 30h30M20 11h8M20 24h8M20 37h8"/>',
+ console:'<path d="M6 14h36M10 14v26M38 14v26M10 36h28"/><path d="M14 20h9v7h-9zM25 20h9v7h-9z"/>',
+ buffet:'<rect x="8" y="5" width="32" height="18" rx="2"/><rect x="8" y="23" width="32" height="20" rx="2"/><path d="M24 5v18M24 23v20M12 12h8M28 12h8"/>',
+ pouf:'<rect x="8" y="14" width="32" height="18" rx="6"/><path d="M12 32v8M36 32v8M14 22h20"/>',
+ curtain:'<path d="M6 8h36M10 8c4 8 4 24 0 32M16 8c4 8 4 24 0 32M32 8c-4 8-4 24 0 32M38 8c-4 8-4 24 0 32"/>',
  box:'<path d="M24 6l16 8v20l-16 8-16-8V14z"/><path d="M8 14l16 8 16-8M24 22v20"/>'
 };
 function scIcon(t,name){
@@ -2390,7 +2395,7 @@ function scIcon(t,name){
   else if(t===FT[1])k='wardrobe';else if(t===FT[2])k='bed';else if(t===FT[3])k='bedroom';
   else if(t===FT[4])k='tv';else if(t===FT[5])k='table';else if(t===FT[6])k='desk';
   else if(t===FT[7])k='sofa';else if(t===FT[8])k='chair';else if(t===FT[9])k='dresser';
-  else if(t===FT[10])k='night';else if(t===FT[11])k='shelf';
+  else if(t===FT[10])k='night';else if(t===FT[11])k='shelf';else if(t===FT[13])k='shoe';else if(t===FT[14])k='kitchen';else if(t===FT[15])k='buffet';else if(t===FT[16])k='console';else if(t===FT[17])k='pouf';else if(t===FT[18])k='curtain';
   return '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">'+SCI[k]+'</svg>';
 }
 function getScope(id){return scopes[id]||(scopes[id]={status:SCS[0],date:'',by:'',note:'',items:{}});}
@@ -2444,7 +2449,7 @@ function rectSvg(a,b,ta,tb,title,plan){
 }
 
 /* ---------- أنواع الأثاث وتفاصيل المجسم ---------- */
-var FT=['صندوق عام','دولاب / خزانة','سرير','غرفة نوم كاملة','طاولة تلفزيون','طاولة / سفرة','مكتب','كنبة','كرسي','تسريحة','كومدينو','مكتبة / رف','تصميم مخصص حر'];
+var FT=['صندوق عام','دولاب / خزانة','سرير','غرفة نوم كاملة','طاولة تلفزيون','طاولة / سفرة','مكتب','كنبة','كرسي','تسريحة','كومدينو','مكتبة / رف','تصميم مخصص حر','جزامة / خزانة أحذية','مطبخ (وحدات)','بوفيه / نيش / فاترينة','كونسول / مدخل','بوف / دكة','ستارة'];
 var CL={wood:['#f5dcaa','#d9b774','#e8c98c'],fab:['#dfe6ea','#a9b6bd','#c4d0d6'],fab2:['#f1f4f6','#c3cdd3','#e2e8ec'],glass:['#d8eef6','#9cc3d1','#b7d9e6']};
 function guessFT(name){
   var seg=String(name||'').split('—'),n=seg[seg.length-1],whole=seg.length===1;
@@ -2453,6 +2458,12 @@ function guessFT(name){
   if(/كومد|كمد/.test(n))return FT[10];
   if(/تسريحة|تسريحه|تسريحات/.test(n))return FT[9];
   if(/تلفزيون|تلفاز|شاشة|TV/i.test(n))return FT[4];
+  if(/جزام|جزمة|جزمه|أحذية|احذية|حذاء|حذاه|شوز/.test(n))return FT[13];
+  if(/مطبخ|مطابخ|كاونتر/.test(n))return FT[14];
+  if(/بوفيه|بوفية|نيش|فاترين|فترين|vitrine/i.test(n))return FT[15];
+  if(/كونسول|كنسول|مدخل/.test(n))return FT[16];
+  if(/ستارة|ستاره|ستائر|ستاير|برادي/.test(n))return FT[18];
+  if(/(^|\s)(بوف|بوفات|بوفة|دكة|دكه|بنش|ستول)(\s|$)/.test(n))return FT[17];
   if(/مكتبة|مكتبه|(^|\s)(رف|رفوف|أرفف)(\s|$)/.test(n))return FT[11];
   if(/دولاب|خزانة|خزانه|كبت|وردروب|ملابس/.test(n))return FT[1];
   if(/مكتب/.test(n))return FT[6];
@@ -2466,9 +2477,9 @@ function ftype(d,name){return FT.indexOf(d.type)>-1?d.type:guessFT(name);}
 function fdef(t,d,L){
   function n(v,def,mx){var x=parseFloat(v);return (v===''||v==null||isNaN(x))?def:Math.min(mx,Math.max(0,Math.round(x)));}
   return {
-    doors:n(d.doors,t===FT[1]?Math.max(2,Math.round(num(L)/50)):t===FT[4]?1:t===FT[3]?3:0,12),
-    drawers:n(d.drawers,t===FT[4]?2:t===FT[6]?3:t===FT[9]?3:t===FT[10]?2:0,10),
-    shelves:n(d.shelves,t===FT[11]?4:t===FT[7]?Math.max(2,Math.round(num(L)/70)):0,12)
+    doors:n(d.doors,t===FT[1]?Math.max(2,Math.round(num(L)/50)):t===FT[4]?1:t===FT[3]?3:t===FT[13]?Math.max(2,Math.round(num(L)/40)):t===FT[14]?Math.max(3,Math.round(num(L)/45)):t===FT[15]?2:t===FT[18]?2:0,12),
+    drawers:n(d.drawers,t===FT[4]?2:t===FT[6]?3:t===FT[9]?3:t===FT[10]?2:t===FT[14]?3:t===FT[15]?2:t===FT[16]?2:0,10),
+    shelves:n(d.shelves,t===FT[11]?4:t===FT[13]?4:t===FT[15]?3:t===FT[7]?Math.max(2,Math.round(num(L)/70)):0,12)
   };
 }
 function pDoors(n,u0,u1,v0,v1){
@@ -2490,6 +2501,9 @@ function frontPlan(t,r,forBox){
   if(t===FT[9])return forBox?pDrawers(r.drawers,0,1,0,1):pDrawers(r.drawers,0,1,0,0.5).concat([{k:'r',u:0.1,v:0.55,w:0.8,h:0.42,f:'#b7d9e6'}]);
   if(t===FT[10])return pDrawers(r.drawers,0,1,0,1);
   if(t===FT[11]){a=[{k:'r',u:0.04,v:0.03,w:0.92,h:0.94,f:'#a98a58'}];for(k=1;k<r.shelves;k++)a.push({k:'l',u1:0.04,v1:k/r.shelves,u2:0.96,v2:k/r.shelves});return a;}
+  if(t===FT[13]){a=pDoors(Math.max(1,r.doors),0,1,0,1);for(k=1;k<Math.max(1,r.shelves);k++)a.push({k:'l',u1:0.03,v1:k/Math.max(1,r.shelves),u2:0.97,v2:k/Math.max(1,r.shelves)});return a;}
+  if(t===FT[14])return pDrawers(Math.max(1,r.drawers),0,0.25,0,1).concat([{k:'l',u1:0.25,v1:0,u2:0.25,v2:1}],pDoors(Math.max(1,r.doors-1),0.25,1,0,1));
+  if(t===FT[15])return pDoors(Math.max(1,r.doors),0,r.drawers>0?0.7:1,0,1).concat(r.drawers>0?pDrawers(r.drawers,0.7,1,0,1).concat([{k:'l',u1:0.7,v1:0,u2:0.7,v2:1}]):[]);
   return null;
 }
 function furnDesc(t,r){
@@ -2504,6 +2518,12 @@ function furnDesc(t,r){
   if(t===FT[9])return 'تسريحة '+r.drawers+' أدراج + مرآة';
   if(t===FT[10])return 'كومدينو '+r.drawers+' أدراج';
   if(t===FT[11])return 'مكتبة '+r.shelves+' أرفف مفتوحة';
+  if(t===FT[13])return 'جزامة '+r.doors+' أبواب بـ '+r.shelves+' أرفف للأحذية';
+  if(t===FT[14])return 'وحدات سفلية: '+r.drawers+' أدراج + '+Math.max(1,r.doors-1)+' أبواب + سطح عمل + وحدات علوية';
+  if(t===FT[15])return 'بوفيه: جزء سفلي '+r.doors+' أبواب'+(r.drawers?' + '+r.drawers+' أدراج':'')+' وجزء علوي زجاجي '+r.shelves+' أرفف';
+  if(t===FT[16])return 'سطح + 4 أرجل'+(r.drawers?' + '+r.drawers+' أدراج':'')+' + رف سفلي';
+  if(t===FT[17])return 'مقعد منجّد على 4 أرجل';
+  if(t===FT[18])return 'ستارة '+r.doors+' بانيو + سكة علوية';
   return 'صندوق بالأبعاد المدخلة';
 }
 function furnSvg(t,L,W,H,r){
@@ -2599,6 +2619,42 @@ function furnSvg(t,L,W,H,r){
   else if(t===FT[9])dresserAt(0,0,L,W,H);
   else if(t===FT[10])box(0,0,0,L,W,H,WD,frontPlan(t,r,true));
   else if(t===FT[11])box(0,0,0,L,W,H,WD,frontPlan(t,r));
+  else if(t===FT[13]){
+    box(L*0.02,W*0.02,0,L*0.96,W*0.96,H*0.07,WD);
+    box(0,0,H*0.07,L,W,H*0.93,WD,frontPlan(t,r));
+  }
+  else if(t===FT[14]){
+    var kb=H*0.4,CT=['#ece9e2','#cfcbc2','#dcd8cf'];
+    box(0,0,0,L,W,kb,WD,frontPlan(t,r));
+    box(-L*0.005,0,kb,L*1.01,W*1.04,H*0.03,CT);
+    box(0,0,H*0.66,L,W*0.6,H*0.34,WD,pDoors(Math.max(2,r.doors),0,1,0,1));
+  }
+  else if(t===FT[15]){
+    box(0,0,0,L,W,H*0.5,WD,frontPlan(t,r));
+    var bgp=[{k:'r',u:0.05,v:0.07,w:0.9,h:0.86,f:'#b7d9e6'},{k:'l',u1:0.5,v1:0.07,u2:0.5,v2:0.93}],bk2;
+    for(bk2=1;bk2<Math.max(1,r.shelves);bk2++)bgp.push({k:'l',u1:0.05,v1:0.07+0.86*bk2/Math.max(1,r.shelves),u2:0.95,v2:0.07+0.86*bk2/Math.max(1,r.shelves)});
+    box(0,0,H*0.5,L,W*0.6,H*0.5,WD,bgp);
+  }
+  else if(t===FT[16]){
+    lg=Math.max(Math.min(L,W)*0.07,1);th=Math.max(H*0.06,1);
+    var cdn=Math.max(0,r.drawers),cap=[],ck2;
+    box(0,0,0,lg,lg,H-th,WD);box(L-lg,0,0,lg,lg,H-th,WD);box(0,W-lg,0,lg,lg,H-th,WD);box(L-lg,W-lg,0,lg,lg,H-th,WD);
+    box(lg,W*0.1,H*0.22,L-2*lg,W*0.8,H*0.03,WD);
+    for(ck2=0;ck2<cdn;ck2++){if(ck2>0)cap.push({k:'l',u1:ck2/cdn,v1:0,u2:ck2/cdn,v2:1});cap.push({k:'l',b:1,u1:(ck2+0.5)/cdn-0.06,v1:0.5,u2:(ck2+0.5)/cdn+0.06,v2:0.5});}
+    box(lg,W*0.1,H-th-H*0.14,L-2*lg,W*0.8,H*0.14,WD,cap);
+    box(0,0,H-th,L,W,th,WD);
+  }
+  else if(t===FT[17]){
+    lg=Math.max(Math.min(L,W)*0.07,1);
+    box(0,0,0,lg,lg,H*0.28,WD);box(L-lg,0,0,lg,lg,H*0.28,WD);box(0,W-lg,0,lg,lg,H*0.28,WD);box(L-lg,W-lg,0,lg,lg,H*0.28,WD);
+    box(0,0,H*0.28,L,W,H*0.64,FB);
+    box(L*0.04,W*0.04,H*0.92,L*0.92,W*0.92,H*0.08,CL.fab2);
+  }
+  else if(t===FT[18]){
+    var cn2=Math.max(1,r.doors||2),cm=Math.max(6,Math.round(cn2*L/14)),cj;
+    for(cj=0;cj<cm;cj++)box(L*cj/cm,(cj%2)*W*0.4,0,L/cm,W*0.6,H*0.96,cj%2?FB:CL.fab2);
+    box(0,0,H*0.96,L,W,H*0.04,WD);
+  }
   else box(0,0,0,L,W,H,WD);
   function T(q,dx,dy,tx,anc){return '<text x="'+(q[0]+dx).toFixed(1)+'" y="'+(q[1]+dy).toFixed(1)+'" text-anchor="'+anc+'" font-size="11" font-weight="700" fill="#6c1214">'+esc(tx)+'</text>';}
   return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" style="max-width:100%;height:auto" role="img" aria-label="'+esc('مجسم ثلاثي الأبعاد — '+t)+'">'+
@@ -3046,7 +3102,7 @@ function renderScope(){
       '<div class="grid">'+f('l','الطول (سم)')+f('w','العرض (سم)')+f('h','الارتفاع (سم)')+
       '<div class="wide"><label>نوع الأثاث (يحدد شكل المجسم)</label><select data-sk="'+k+'" data-k="type">'+FT.map(function(x){return '<option'+(x===ftype(d,u.name)?' selected':'')+'>'+x+'</option>';}).join('')+'</select></div>'+
       g('doors','عدد الأبواب')+g('drawers','عدد الأدراج')+g('shelves','أرفف / وسائد')+
-      '<div class="wide"><label>ملاحظات (سماكة، فتحات، تفاصيل)</label><input data-sk="'+k+'" data-k="note" value="'+esc(d.note)+'"></div></div>'+doorEditor(k,d,u.name)+secEditor(k,d,u.name)+catSlots(k,d)+galSlots(k,d)+
+      '<div class="wide"><label>ملاحظات (سماكة، فتحات، تفاصيل)</label><input data-sk="'+k+'" data-k="note" value="'+esc(d.note)+'"></div></div>'+doorEditor(k,d,u.name)+secEditor(k,d,u.name)+catSlots(k,d)+cimgSlots(k,d)+galSlots(k,d)+
       '<div class="fv3" data-sk="'+k+'" data-nm="'+esc(u.name)+'" data-col="'+esc(u.p&&u.p.color||'')+'"></div>'+
       (us.length>1?'<div class="scnav">'+
         '<button type="button" class="btn ghost" data-a="scnav" data-d="-1"'+(sKeys.indexOf(k)===0?' disabled':'')+'>› الصنف السابق</button>'+
@@ -3065,7 +3121,7 @@ function secPrint(d,u){
   return '<table class="kv"><tr><td>التقسيم الداخلي (من اليسار)</td><td colspan="5">'+esc(secDesc(secs,lay))+(lay.note?'<br>'+esc(lay.note):'')+'</td></tr></table>'+
     '<div style="text-align:center;margin:6px 0">'+interiorSvg(t,L,H,secs,lay,d.sf)+'</div>';
 }
-var SCPO=[['hdr','بيانات الطلب والعميل (رقم الطلب، العميل، التليفون، الموقع)'],['oimg','صور طلب العميل'],['pano','صور البانوراما 360°'],['plan','مخطط التوزيع / المسقط'],['inf','جدول الصنف (الكمية والأبعاد والملاحظات + صورة الصنف)'],['cz','الألوان والتخصيص (المقبض، الدرج، القاعدة، التدرج…)'],['sec','التقسيم الداخلي (المقطع الداخلي)'],['cat','خامات الكاتلوج'],['gal','عناصر المعرض'],['fv','صورة المجسم ثلاثي الأبعاد'],['note','ملاحظات العميل'],['sig','الإقرار والتوقيعات']];
+var SCPO=[['hdr','بيانات الطلب والعميل (رقم الطلب، العميل، التليفون، الموقع)'],['oimg','صور طلب العميل'],['pano','صور البانوراما 360°'],['plan','مخطط التوزيع / المسقط'],['inf','جدول الصنف (الكمية والأبعاد والملاحظات + صورة الصنف)'],['cimg','صور الأصناف التي اختارها العميل'],['cz','الألوان والتخصيص (المقبض، الدرج، القاعدة، التدرج…)'],['sec','التقسيم الداخلي (المقطع الداخلي)'],['cat','خامات الكاتلوج'],['gal','عناصر المعرض'],['fv','صورة المجسم ثلاثي الأبعاد'],['note','ملاحظات العميل'],['sig','الإقرار والتوقيعات']];
 function scPrefs(){
   var d={},i;SCPO.forEach(function(x){d[x[0]]=true;});d.items=null;d.mode='auto';
   try{var v=JSON.parse(localStorage.getItem('khz_scprint')||'null');if(v&&typeof v==='object'){for(i in v)if(i in d&&i!=='items')d[i]=v[i];}}catch(e){}
@@ -3108,7 +3164,7 @@ function printScope(o,opt){
   us.forEach(function(u){
     if(opt.items&&opt.items[scKey(u)]===false)return;
     var d=scItem(sc,u);
-    h+='<div class="brk">'+(on('inf')?'<div style="display:flex;gap:8px;align-items:flex-start">'+pImg(lineImg(u.l),'width:84px;height:84px;flex:none')+'<div style="flex:1;min-width:0"><table class="kv"><tr><td>الصنف</td><td>'+esc(u.name)+'</td><td>الكمية</td><td>'+fmt(u.qty)+'</td><td>الأبعاد (سم)</td><td>'+(num(d.l)>0?esc(d.l)+' × '+esc(d.w)+' × '+esc(d.h)+' (طول × عرض × ارتفاع)':'غير محددة')+'</td></tr>'+(d.note?'<tr><td>ملاحظات</td><td colspan="5">'+esc(d.note)+'</td></tr>':'')+'</table></div></div>':'<h3 style="margin:8px 0 4px">'+esc(u.name)+'</h3>')+(on('cz')?czPrint(d):'')+(on('sec')?secPrint(d,u):'')+(on('cat')?catPrint(d):'')+(on('gal')?galPrint(d):'')+(on('fv')?fvSnap(scKey(u),d,u.name):'')+'</div>';
+    h+='<div class="brk">'+(on('inf')?'<div style="display:flex;gap:8px;align-items:flex-start">'+pImg(lineImg(u.l),'width:84px;height:84px;flex:none')+'<div style="flex:1;min-width:0"><table class="kv"><tr><td>الصنف</td><td>'+esc(u.name)+'</td><td>الكمية</td><td>'+fmt(u.qty)+'</td><td>الأبعاد (سم)</td><td>'+(num(d.l)>0?esc(d.l)+' × '+esc(d.w)+' × '+esc(d.h)+' (طول × عرض × ارتفاع)':'غير محددة')+'</td></tr>'+(d.note?'<tr><td>ملاحظات</td><td colspan="5">'+esc(d.note)+'</td></tr>':'')+'</table></div></div>':'<h3 style="margin:8px 0 4px">'+esc(u.name)+'</h3>')+(on('cimg')?cimgPrint(d,u):'')+(on('cz')?czPrint(d):'')+(on('sec')?secPrint(d,u):'')+(on('cat')?catPrint(d):'')+(on('gal')?galPrint(d):'')+(on('fv')?fvSnap(scKey(u),d,u.name):'')+'</div>';
   });
   if(sc.note&&on('note'))h+=kv([['ملاحظات العميل',sc.note]]);
   if(on('sig'))h+='<p>أقرّ بأنني راجعت المقاسات والمجسم أعلاه ووافقت عليها كنطاق للتنفيذ.</p>'+sigs(['توقيع العميل','مندوب المبيعات','المراجع','مدير الإنتاج']);
@@ -3679,7 +3735,7 @@ function planPrint(o){
   }).join('');
 }
 /* ---- شاشة العرض للعميل: غرفة ثلاثية الأبعاد (قابلة للتدوير) ---- */
-var P3H={0:80,1:210,2:100,3:220,4:55,5:76,6:76,7:85,8:90,9:140,10:50,11:185};
+var P3H={0:80,1:210,2:100,3:220,4:55,5:76,6:76,7:85,8:90,9:140,10:50,11:185,13:110,14:215,15:160,16:80,17:45,18:250};
 var P3FL=[[203,170,128],[196,160,118],[210,178,136]];
 function p3Clone(b){
   var c={},k;for(k in b)c[k]=b[k];
@@ -5058,7 +5114,7 @@ function fvBed(a,L,W,H,C){
 }
 function fvBuild(S,st){
   var a=[],t=S.t,L=S.L,W=S.W,H=S.H,r=S.r,open=st.open||0,F=(st.cc&&fvHex(st.cc))||FVFIN[st.ci||0][1],tmp,i,lg,th;
-  F=F.slice();F.m=(t===FT[7]||t===FT[8])?'fabric':'wood';
+  F=F.slice();F.m=(t===FT[7]||t===FT[8]||t===FT[17]||t===FT[18])?'fabric':'wood';
   var oo=st.o||{},cz=oo.cz||{},gl=oo.gl||{},hdc=fvHex(cz.handle),drc=fvHex(cz.drawer),bsc=fvHex(cz.base);
   if(drc)drc.m='wood';if(hdc)hdc.m='metal';
   var C={w:F,wi:fvMix(F,[255,255,255],0.16),dk:fvSh(F,0.7),mt:hdc||[182,146,76],rd:[182,146,76],dw:drc||F,dwi:fvMix(drc||F,[255,255,255],0.16),bs:bsc||hdc||fvSh(F,0.7),fr:bsc||[38,36,38],hs:oo.hs||'v',gt:gl.t||'',gp:gl.pos||'mid',gn:parseInt(gl.n,10)||2,gl:[176,218,230],fa:((st.set&&(t===FT[7]||t===FT[8]))?fvSh(F,1.05):[200,206,212]),ma:[240,238,232],pl:[252,252,250],tv:[26,28,32]};
@@ -5128,6 +5184,49 @@ function fvBuild(S,st){
   }
   else if(t===FT[11])fvCab(a,L,W,H,{secs:S.secs,base:0,books:true,skin:true},C,open);
   else if(t===FT[12])fvB(a,-4,-4,-0.6,L+8,W+8,0.6,[232,222,208],{tag:'floor'});
+  else if(t===FT[13]){
+    var shb=Math.min(8,H*0.07);
+    fvCab(a,L,W,H,{secs:[{k:'shelves',n:Math.max(1,r.shelves)}],base:shb,skin:true},C,open);
+    fvDoors(a,0,L,0,shb+0.3,H-0.3,Math.max(1,r.doors),open,C);
+  }
+  else if(t===FT[14]){
+    var kbh=Math.min(90,H*0.42),kbs=Math.min(10,kbh*0.11),kcw=L*0.25,kwd=Math.min(35,W*0.62),kwh=Math.min(70,H*0.32);
+    fvCab(a,L,W,kbh-3,{secs:[{k:'shelves',n:1}],base:kbs},C,open);
+    fvDoors(a,kcw,L-kcw,0,kbs+0.3,kbh-3.3,Math.max(1,r.doors-1),open,C);
+    fvDrawerStack(a,0,0,kcw,W-4,kbs,kbh-3,Math.max(1,r.drawers),open,C);
+    fvB(a,-1.5,-2.5,kbh-3,L+3,W+3.5,3,[214,210,202]);
+    tmp=[];fvCab(tmp,L,kwd,kwh,{secs:[{k:'shelves',n:2}],base:0},C,open);
+    fvDoors(tmp,0,L,0,0.3,kwh-0.3,Math.max(2,r.doors),open,C);
+    fvShift(tmp,0,W-kwd,H-kwh);fvTagFrom(tmp,0,'الوحدات العلوية');fvPush(a,tmp);
+  }
+  else if(t===FT[15]){
+    var bfh=H*0.5,bfs=Math.min(8,bfh*0.1),bdc=r.drawers>0?L*0.3:0,bgd=W*0.6,Cg={},bkk;
+    fvCab(a,L,W,bfh,{secs:[{k:'shelves',n:1}],base:bfs},C,open);
+    fvDoors(a,0,L-bdc,0,bfs+0.3,bfh-0.3,Math.max(1,r.doors),open,C);
+    if(bdc)fvDrawerStack(a,L-bdc,0,bdc,W-4,bfs,bfh,r.drawers,open,C);
+    for(bkk in C)Cg[bkk]=C[bkk];Cg.gt=C.gt||'clear';Cg.gp='all';Cg.gn=3;
+    tmp=[];fvCab(tmp,L,bgd,H-bfh,{secs:[{k:'shelves',n:Math.max(1,r.shelves)}],base:0},C,open);
+    fvDoors(tmp,0,L,0,0.3,H-bfh-0.3,Math.max(1,Math.min(r.doors||2,3)),open,Cg);
+    fvShift(tmp,0,W-bgd,bfh);fvTagFrom(tmp,0,'الجزء العلوي الزجاجي');fvPush(a,tmp);
+  }
+  else if(t===FT[16]){
+    var cth=Math.max(2.5,H*0.04),clg=Math.max(3,Math.min(L,W)*0.07),cdn=Math.max(0,r.drawers),cdw=(L-2*clg-3)/Math.max(cdn,1),cdh=Math.min(14,H*0.2),cdi;
+    fvB(a,0,0,H-cth,L,W,cth,C.w);
+    [[1.5,1.5],[L-clg-1.5,1.5],[1.5,W-clg-1.5],[L-clg-1.5,W-clg-1.5]].forEach(function(q){fvB(a,q[0],q[1],0,clg,clg,H-cth,C.w);});
+    fvB(a,clg+1.5,3,H*0.22,L-2*clg-3,W-6,2,C.wi);
+    for(cdi=0;cdi<cdn;cdi++)fvDrawer(a,clg+1.5+cdi*cdw,0,H-cth-cdh,cdw,W-6,cdh,open*(W-6)*0.5,C);
+  }
+  else if(t===FT[17]){
+    var plh=Math.max(5,H*0.28),plg=Math.max(3,Math.min(L,W)*0.07);
+    [[1,1],[L-plg-1,1],[1,W-plg-1],[L-plg-1,W-plg-1]].forEach(function(q){fvB(a,q[0],q[1],0,plg,plg,plh,C.dk);});
+    fvB(a,0,0,plh,L,W,H-plh,C.fa);
+    fvB(a,L*0.05,W*0.05,H,L*0.9,W*0.9,0.8,fvSh(C.fa,1.1));
+  }
+  else if(t===FT[18]){
+    var cn3=Math.max(1,r.doors||2),cpw=L/cn3,ctn=Math.max(4,Math.round(cpw/8)),cw2=cpw/ctn,cdp=Math.max(2,W*0.5),cj3,ck3;
+    fvB(a,0,0,H-2.5,L,Math.max(2,Math.min(W,4)),2.5,C.mt);
+    for(cj3=0;cj3<cn3;cj3++)for(ck3=0;ck3<ctn;ck3++)fvB(a,cj3*cpw+ck3*cw2,(ck3%2)*Math.min(W*0.5,3),1,cw2*1.02,cdp,H-3.5,ck3%2?fvSh(C.fa,0.9):C.fa);
+  }
   else fvB(a,0,0,0,L,W,H,C.w);
   fvTagFrom(a,0,fvDefName(t));
   if(oo.cust&&oo.cust.length)fvCustom(a,oo.cust,C);
@@ -5816,7 +5915,7 @@ function fvDefState(host,d){
   else if(!st.set){var g=fvGuess((host.dataset.col||'')+' '+(d&&d.note||''));if(g){st.cc=g.cc;st.set=true;}}
   return st;
 }
-function fvTypeDoors(d,name){var t=ftype(d,name);return t===FT[1]||t===FT[3]||t===FT[4];}
+function fvTypeDoors(d,name){var t=ftype(d,name);return t===FT[1]||t===FT[3]||t===FT[4]||t===FT[13]||t===FT[14]||t===FT[15];}
 var MIRL={rect:'مستطيلة',sq:'مربعة',round:'دائرية',half:'نصف دائرية',pill:'بيضاوية طولية',blob:'عضوية حرة',arch:'قوس',ledframe:'إطار ليد',holly:'هوليوود (لمبات)',none:'بدون مرآة'};
 var DLGL={wood:'خشبي',gold:'ذهبي',black:'أسود'};
 var WSHL={'0':'بدون','1':'رف واحد','2':'رفّان','3':'ثلاثة رفوف'};
@@ -6130,7 +6229,7 @@ function fvCustMat(p,C){
 }
 function fvCloneBox(b){var c={},k;for(k in b)c[k]=b[k];if(b.rot)c.rot=b.rot.map(function(r){return {hx:r.hx,hy:r.hy,a:r.a};});if(b.pl){c.pl={};for(k in b.pl)c.pl[k]=b.pl[k];c.pl.A=b.pl.A.map(function(p){return p.slice();});c.pl.B=b.pl.B.map(function(p){return p.slice();});}if(b.inw)c.inw=b.inw.slice();return c;}
 function fvTagFrom(a,n0,name){var i;for(i=n0;i<a.length;i++)if(!a[i].part&&a[i].tag!=='floor')a[i].part=name;}
-function fvDefName(t){var m={};m[FT[0]]='الصنف';m[FT[1]]='الدولاب';m[FT[2]]='السرير';m[FT[3]]='الغرفة';m[FT[4]]='وحدة التلفزيون';m[FT[5]]='الطاولة';m[FT[6]]='المكتب';m[FT[7]]='الكنبة';m[FT[8]]='الكرسي';m[FT[9]]='التسريحة';m[FT[10]]='الكومدينو';m[FT[11]]='المكتبة';m[FT[12]]='التصميم';return m[t]||'الصنف';}
+function fvDefName(t){var m={};m[FT[0]]='الصنف';m[FT[1]]='الدولاب';m[FT[2]]='السرير';m[FT[3]]='الغرفة';m[FT[4]]='وحدة التلفزيون';m[FT[5]]='الطاولة';m[FT[6]]='المكتب';m[FT[7]]='الكنبة';m[FT[8]]='الكرسي';m[FT[9]]='التسريحة';m[FT[10]]='الكومدينو';m[FT[11]]='المكتبة';m[FT[12]]='التصميم';m[FT[13]]='الجزامة';m[FT[14]]='المطبخ';m[FT[15]]='البوفيه';m[FT[16]]='الكونسول';m[FT[17]]='البوف';m[FT[18]]='الستارة';return m[t]||'الصنف';}
 function fvNewId(p){return p+Date.now().toString(36)+Math.floor(Math.random()*99);}
 function fvPartLabel(d,name){
   var i;
@@ -8124,6 +8223,32 @@ function galBannerHtml(){
     '<div class="bar"><button class="btn gold" type="button" data-a="galdone">✓ تم — العودة للمراجعة</button></div></div>';
 }
 function galBannerRender(){var b=$('galBanner');if(b)b.innerHTML=galBannerHtml();}
+/* ---- صورة الصنف التي اختارها العميل (رفع مباشر لكل صنف) ---- */
+function cimgSlots(k,d){
+  var arr=d.cimgs||[];
+  return '<div class="catslots cimgslots"><b>صورة الصنف التي اختارها العميل</b> <span class="hint">— ارفع صورة (أو أكثر) من اختيار العميل لهذا الصنف فتظهر كبيرة تحت الصنف في نموذج المراجعة المطبوع</span>'+
+    '<div class="slsel" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px">'+arr.map(function(x,i){
+      return '<div class="slchip" style="flex-direction:column;align-items:stretch;width:150px"><img src="'+x.src+'" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:8px;display:block"><input data-ik="'+k+'" data-ci="'+i+'" value="'+esc(x.cap||'')+'" placeholder="وصف الصورة (اختياري)" aria-label="وصف الصورة"><button type="button" class="btn sm red" data-a="cimgrm" data-ik="'+k+'" data-ci="'+i+'">حذف</button></div>';
+    }).join('')+'</div>'+
+    '<button type="button" class="btn ghost sm" style="margin-top:8px" data-a="cimgadd" data-ik="'+k+'">+ رفع صورة الصنف</button></div>';
+}
+function cimgPrint(d,u){
+  var a=d.cimgs||[];if(!a.length)return '';
+  return '<div style="margin:6px 0 8px">'+a.map(function(x){
+    return '<figure style="margin:0 0 10px;width:100%;break-inside:avoid;page-break-inside:avoid"><img src="'+x.src+'" alt="" style="display:block;width:100%;height:auto;max-height:120mm;object-fit:contain;background:#f6f3ef;border:1px solid #444;border-radius:10px"><figcaption style="text-align:center;margin-top:3px;font-weight:600">'+esc(x.cap||('الصنف المختار من العميل — '+(u&&u.name||'')))+'</figcaption></figure>';
+  }).join('')+'</div>';
+}
+function cimgAct(o,b){
+  var ac=b.dataset.a,k=b.dataset.ik,d=getScope(o.id).items[k]||(getScope(o.id).items[k]={l:'',w:'',h:'',note:''});
+  if(ac==='cimgrm'){
+    (d.cimgs||[]).splice(+b.dataset.ci,1);
+    var y=window.scrollY;renderScope();window.scrollTo(0,y);schedSave();return;
+  }
+  pickImage(function(src){
+    (d.cimgs||(d.cimgs=[])).push({src:src,cap:''});
+    var y2=window.scrollY;renderScope();window.scrollTo(0,y2);schedSave();toast('تمت إضافة صورة الصنف');
+  });
+}
 function galSlots(k,d){
   var arr=d.gal||[];
   return '<div class="catslots galslots"><b>منتجات من معرض المنتجات</b> <span class="hint">— اختر الصور والفيديوهات التي وافق عليها العميل فتُضاف إلى الطلب وتظهر في نموذج المراجعة المطبوع</span>'+
@@ -8293,6 +8418,7 @@ function initNew(){
     var t=e.target;if(!scOrderId)return;
     var sc=getScope(scOrderId);
     if(t.dataset.pl!==undefined){planInput(t);return;}
+    if(t.dataset.ik!==undefined&&t.dataset.ci!==undefined){var ci0=sc.items[t.dataset.ik]&&sc.items[t.dataset.ik].cimgs&&sc.items[t.dataset.ik].cimgs[+t.dataset.ci];if(ci0){ci0.cap=t.value;schedSave();}return;}
     if(t.dataset.pcap!==undefined){var pp0=sc.pano&&sc.pano[+t.dataset.pcap];if(pp0){pp0.cap=t.value;schedSave();}return;}
     if(t.dataset.bf!==undefined){if(t.tagName==='SELECT'||t.type==='checkbox')return;if(bayApply(t)){fvRedraw(t.dataset.bk);schedSave();}return;}
     if(t.dataset.ds!==undefined)return;
@@ -8348,6 +8474,7 @@ function initNew(){
     }
     if(ac==='panoadd'||ac==='panoview'||ac==='panorm'){panoScopeAct(o,b);return;}
     if(ac.slice(0,4)==='plan'){planAct(o,b);return;}
+    if(ac==='cimgadd'||ac==='cimgrm'){cimgAct(o,b);return;}
     if(ac==='galpick'||ac==='galrm'||ac==='galview'||ac==='galshare'){galScopeAct(o,b);return;}
     if(ac==='catpick'||ac==='catrm'||ac==='xsadd'||ac==='xsdel'){catScopeAct(o,b);return;}
     if(ac==='opentab'){
