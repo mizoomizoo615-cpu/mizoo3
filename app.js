@@ -3021,7 +3021,7 @@ function renderScope(){
     '<div class="wide"><label for="scBy">اسم من راجع النطاق مع العميل</label><input id="scBy" data-o="by" value="'+esc(sc.by)+'"></div>'+
     '<div class="full"><label for="scNote">ملاحظات العميل / التعديلات المطلوبة</label><textarea id="scNote" data-o="note">'+esc(sc.note)+'</textarea></div></div>'+
     ordImgStrip(o)+panoSection(sc)+
-    '<div class="bar" style="margin-top:12px"><button class="btn ghost" data-a="scparse" type="button">استخراج الأبعاد من حقل «المقاس» في الطلب</button><label style="display:inline-flex;align-items:center;gap:6px;font-weight:600">صورة المجسم في الطباعة <select id="scPrMode" style="width:auto;min-height:34px"><option value="auto">حسب إعداد كل صنف</option><option value="day">وضع النهار</option><option value="night">وضع الليل</option><option value="both">النهار والليل معًا</option></select></label><button class="btn" data-a="scvideo" type="button">🎬 فيديو عرض الطلب (موشن جرافيك)</button><button class="btn gold" data-a="scprint" type="button">طباعة نموذج المراجعة للتوقيع</button></div></div>';
+    '<div class="bar" style="margin-top:12px"><button class="btn ghost" data-a="scparse" type="button">استخراج الأبعاد من حقل «المقاس» في الطلب</button><label style="display:inline-flex;align-items:center;gap:6px;font-weight:600">صورة المجسم في الطباعة <select id="scPrMode" style="width:auto;min-height:34px"><option value="auto">حسب إعداد كل صنف</option><option value="day">وضع النهار</option><option value="night">وضع الليل</option><option value="both">النهار والليل معًا</option></select></label><button class="btn" data-a="scvideo" type="button">🎬 فيديو عرض الطلب (موشن جرافيك)</button><button class="btn gold" data-a="scprint" type="button">🖨 طباعة نموذج المراجعة (اختر ما تريد)</button></div></div>';
   if(!us.length)h+='<div class="card"><div class="empty">لا توجد أصناف بكميات في هذا الطلب.</div></div>';
   var sKeys=us.map(scKey),sk=scSel[o.id];
   if(sKeys.indexOf(sk)<0)sk=sKeys[0];
@@ -3065,15 +3065,53 @@ function secPrint(d,u){
   return '<table class="kv"><tr><td>التقسيم الداخلي (من اليسار)</td><td colspan="5">'+esc(secDesc(secs,lay))+(lay.note?'<br>'+esc(lay.note):'')+'</td></tr></table>'+
     '<div style="text-align:center;margin:6px 0">'+interiorSvg(t,L,H,secs,lay,d.sf)+'</div>';
 }
-function printScope(o){
-  var sc=getScope(o.id),us=mfgUnits(o);
-  var h='<h2>نموذج مراجعة نطاق العمل مع العميل</h2>'+kv([['رقم الطلب',o.orderNo,'العميل',o.custName,'التليفون',o.phone],['موقع التركيب',(o.address||'')+' '+(o.area||''),'تاريخ المراجعة',sc.date||'','حالة المراجعة',sc.status]])+ordImgsLarge(o)+panoPrint(sc)+planPrint(o);
-  us.forEach(function(u){
-    var d=scItem(sc,u);
-    h+='<div class="brk"><div style="display:flex;gap:8px;align-items:flex-start">'+pImg(lineImg(u.l),'width:84px;height:84px;flex:none')+'<div style="flex:1;min-width:0"><table class="kv"><tr><td>الصنف</td><td>'+esc(u.name)+'</td><td>الكمية</td><td>'+fmt(u.qty)+'</td><td>الأبعاد (سم)</td><td>'+(num(d.l)>0?esc(d.l)+' × '+esc(d.w)+' × '+esc(d.h)+' (طول × عرض × ارتفاع)':'غير محددة')+'</td></tr>'+(d.note?'<tr><td>ملاحظات</td><td colspan="5">'+esc(d.note)+'</td></tr>':'')+'</table></div></div>'+czPrint(d)+secPrint(d,u)+catPrint(d)+galPrint(d)+fvSnap(scKey(u),d,u.name)+'</div>';
+var SCPO=[['hdr','بيانات الطلب والعميل (رقم الطلب، العميل، التليفون، الموقع)'],['oimg','صور طلب العميل'],['pano','صور البانوراما 360°'],['plan','مخطط التوزيع / المسقط'],['inf','جدول الصنف (الكمية والأبعاد والملاحظات + صورة الصنف)'],['cz','الألوان والتخصيص (المقبض، الدرج، القاعدة، التدرج…)'],['sec','التقسيم الداخلي (المقطع الداخلي)'],['cat','خامات الكاتلوج'],['gal','عناصر المعرض'],['fv','صورة المجسم ثلاثي الأبعاد'],['note','ملاحظات العميل'],['sig','الإقرار والتوقيعات']];
+function scPrefs(){
+  var d={},i;SCPO.forEach(function(x){d[x[0]]=true;});d.items=null;d.mode='auto';
+  try{var v=JSON.parse(localStorage.getItem('khz_scprint')||'null');if(v&&typeof v==='object'){for(i in v)if(i in d&&i!=='items')d[i]=v[i];}}catch(e){}
+  return d;
+}
+function scPrintDlg(o){
+  var old=document.getElementById('scPrDlg');if(old)old.remove();
+  var pf=scPrefs(),us=mfgUnits(o),sc=getScope(o.id),md=document.getElementById('scPrMode'),w=document.createElement('div');
+  w.id='scPrDlg';w.className='prdlgw';w.setAttribute('role','dialog');w.setAttribute('aria-label','خيارات طباعة نموذج المراجعة');
+  if(md)pf.mode=md.value||pf.mode;
+  var h='<div class="prdlg"><h3>🖨 ماذا تريد أن تطبع؟</h3><p class="hint">حدّد الأجزاء المطلوبة فقط، وسيُحفظ اختيارك للمرة القادمة.</p>'+
+    '<div class="prsec"><b>الأصناف المطلوب طباعتها</b><div class="prall"><button type="button" class="chip" data-pa="all">تحديد الكل</button><button type="button" class="chip" data-pa="none">إلغاء الكل</button></div>'+
+    (us.length?us.map(function(u){var k=scKey(u);return '<label class="prck"><input type="checkbox" data-pit="'+esc(k)+'" checked> '+esc(u.name)+(u.qty>1?' <small>×'+fmt(u.qty)+'</small>':'')+'</label>';}).join(''):'<span class="hint">لا توجد أصناف.</span>')+'</div>'+
+    '<div class="prsec"><b>محتوى الطباعة</b>'+SCPO.map(function(x){return '<label class="prck"><input type="checkbox" data-po="'+x[0]+'"'+(pf[x[0]]?' checked':'')+'> '+x[1]+'</label>';}).join('')+'</div>'+
+    '<div class="prsec"><label class="prck">صورة المجسم: <select data-pmode style="width:auto;min-height:34px"><option value="auto">حسب إعداد كل صنف</option><option value="day">وضع النهار</option><option value="night">وضع الليل</option><option value="both">النهار والليل معًا</option></select></label></div>'+
+    '<div class="bar" style="margin-top:12px"><button type="button" class="btn gold" data-pgo>طباعة</button><button type="button" class="btn ghost" data-pcancel>إلغاء</button></div></div>';
+  w.innerHTML=h;document.body.appendChild(w);
+  var ms=w.querySelector('[data-pmode]');ms.value=pf.mode;
+  function close(){w.remove();}
+  w.addEventListener('click',function(e){
+    var t=e.target;
+    if(t===w||t.hasAttribute('data-pcancel')){close();return;}
+    var pa=t.getAttribute&&t.getAttribute('data-pa');
+    if(pa){Array.prototype.forEach.call(w.querySelectorAll('[data-pit]'),function(c){c.checked=(pa==='all');});return;}
+    if(t.hasAttribute&&t.hasAttribute('data-pgo')){
+      var opt={items:{}},sv={};
+      SCPO.forEach(function(x){var c=w.querySelector('[data-po="'+x[0]+'"]');opt[x[0]]=sv[x[0]]=!!(c&&c.checked);});
+      Array.prototype.forEach.call(w.querySelectorAll('[data-pit]'),function(c){opt.items[c.getAttribute('data-pit')]=c.checked;});
+      sv.mode=ms.value;try{localStorage.setItem('khz_scprint',JSON.stringify(sv));}catch(er){}
+      if(!us.some(function(u){return opt.items[scKey(u)];})&&us.length){toast('اختر صنفًا واحدًا على الأقل');return;}
+      var pm=document.getElementById('scPrMode');if(pm)pm.value=ms.value;
+      close();printScope(o,opt);
+    }
   });
-  if(sc.note)h+=kv([['ملاحظات العميل',sc.note]]);
-  h+='<p>أقرّ بأنني راجعت المقاسات والمجسم أعلاه ووافقت عليها كنطاق للتنفيذ.</p>'+sigs(['توقيع العميل','مندوب المبيعات','المراجع','مدير الإنتاج']);
+}
+function printScope(o,opt){
+  opt=opt||(function(){var d={items:null},p=scPrefs();SCPO.forEach(function(x){d[x[0]]=p[x[0]];});return d;})();
+  var sc=getScope(o.id),us=mfgUnits(o),on=function(k){return opt[k]!==false;};
+  var h='<h2>نموذج مراجعة نطاق العمل مع العميل</h2>'+(on('hdr')?kv([['رقم الطلب',o.orderNo,'العميل',o.custName,'التليفون',o.phone],['موقع التركيب',(o.address||'')+' '+(o.area||''),'تاريخ المراجعة',sc.date||'','حالة المراجعة',sc.status]]):'')+(on('oimg')?ordImgsLarge(o):'')+(on('pano')?panoPrint(sc):'')+(on('plan')?planPrint(o):'');
+  us.forEach(function(u){
+    if(opt.items&&opt.items[scKey(u)]===false)return;
+    var d=scItem(sc,u);
+    h+='<div class="brk">'+(on('inf')?'<div style="display:flex;gap:8px;align-items:flex-start">'+pImg(lineImg(u.l),'width:84px;height:84px;flex:none')+'<div style="flex:1;min-width:0"><table class="kv"><tr><td>الصنف</td><td>'+esc(u.name)+'</td><td>الكمية</td><td>'+fmt(u.qty)+'</td><td>الأبعاد (سم)</td><td>'+(num(d.l)>0?esc(d.l)+' × '+esc(d.w)+' × '+esc(d.h)+' (طول × عرض × ارتفاع)':'غير محددة')+'</td></tr>'+(d.note?'<tr><td>ملاحظات</td><td colspan="5">'+esc(d.note)+'</td></tr>':'')+'</table></div></div>':'<h3 style="margin:8px 0 4px">'+esc(u.name)+'</h3>')+(on('cz')?czPrint(d):'')+(on('sec')?secPrint(d,u):'')+(on('cat')?catPrint(d):'')+(on('gal')?galPrint(d):'')+(on('fv')?fvSnap(scKey(u),d,u.name):'')+'</div>';
+  });
+  if(sc.note&&on('note'))h+=kv([['ملاحظات العميل',sc.note]]);
+  if(on('sig'))h+='<p>أقرّ بأنني راجعت المقاسات والمجسم أعلاه ووافقت عليها كنطاق للتنفيذ.</p>'+sigs(['توقيع العميل','مندوب المبيعات','المراجع','مدير الإنتاج']);
   openSheet(h);
 }
 
@@ -8336,7 +8374,7 @@ function initNew(){
       }
       var yy1=window.scrollY;renderScope();window.scrollTo(0,yy1);return;
     }
-    if(b.dataset.a==='scprint')printScope(o);
+    if(b.dataset.a==='scprint')scPrintDlg(o);
     if(b.dataset.a==='scvideo')vdOpen(o);
     if(b.dataset.a==='scparse'){
       var sc=getScope(o.id),n=0;
@@ -9441,6 +9479,52 @@ function vdOpen(o){
   document.addEventListener('keydown',VD.keyH);
   VD.raf=requestAnimationFrame(vdTick);
 }
+
+/* ===== إدخال كود اللون السداسي (HEX) بجانب كل منتقي ألوان في جميع الأصناف والأقسام ===== */
+(function(){
+  function norm(v){
+    v=String(v||'').trim().replace(/^#/,'');
+    if(/^[0-9a-f]{3}$/i.test(v))v=v.replace(/./g,function(c){return c+c;});
+    return /^[0-9a-f]{6}$/i.test(v)?'#'+v.toLowerCase():null;
+  }
+  function attach(ci){
+    if(ci.dataset.hexed)return;ci.dataset.hexed='1';
+    var t=document.createElement('input');
+    t.type='text';t.className='hexin';t.maxLength=7;t.placeholder='#RRGGBB';t.dir='ltr';t.spellcheck=false;t.autocomplete='off';
+    t.setAttribute('aria-label','كود اللون السداسي (HEX)');t.title='اكتب كود اللون السداسي مثل #C89C62 ثم Enter';
+    t.value=ci.value||'';
+    t.addEventListener('input',function(){
+      var h=norm(t.value);
+      t.classList.toggle('bad',!!t.value.trim()&&!h);
+      if(!h)return;
+      if(ci.value!==h){
+        ci.value=h;
+        ci.dispatchEvent(new Event('input',{bubbles:true}));
+        ci.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    });
+    t.addEventListener('blur',function(){var h=norm(t.value);t.value=h||ci.value||'';t.classList.remove('bad');});
+    t.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();t.blur();}e.stopPropagation();});
+    ci.addEventListener('input',function(){t.value=ci.value;t.classList.remove('bad');});
+    var anchor=ci.closest('label')||ci;
+    anchor.parentNode.insertBefore(t,anchor.nextSibling);
+    ci._hex=t;
+  }
+  function scan(root){
+    var l=(root.querySelectorAll?root:document).querySelectorAll('input[type="color"]'),i;
+    for(i=0;i<l.length;i++)attach(l[i]);
+  }
+  function syncAll(){
+    var l=document.querySelectorAll('input[type="color"]'),i,ci,t;
+    for(i=0;i<l.length;i++){ci=l[i];t=ci._hex;if(!t){attach(ci);continue;}if(document.activeElement!==t&&t.value!==ci.value&&!t.classList.contains('bad'))t.value=ci.value;}
+  }
+  function start(){
+    scan(document);
+    try{new MutationObserver(function(ms){var q=false;ms.forEach(function(m){if(m.addedNodes&&m.addedNodes.length)q=true;});if(q)scan(document);}).observe(document.body,{childList:true,subtree:true});}catch(e){}
+    setInterval(syncAll,500);
+  }
+  if(document.body)start();else document.addEventListener('DOMContentLoaded',start);
+})();
 
 init();
 })();
