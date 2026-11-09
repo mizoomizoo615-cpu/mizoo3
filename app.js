@@ -7148,13 +7148,13 @@ function fvMount(host,d,name){
   /* ---- لون الصنف كاملاً + ألوان القطع ---- */
   function clBtn(h,attrs,cur){return '<button type="button" class="clsw'+(h===cur?' on':'')+'" '+attrs+' data-v="'+h+'" style="background:'+h+'" title="'+esc(clrName(h))+' '+h+'" aria-label="'+esc(clrName(h))+'"></button>';}
   function clWhole(){
-    var box=czp.querySelector('[data-clw]');if(!box)return;var cur=body();
+    var box=czp.querySelector('[data-clw]');if(!box)return;var cur=bodyHex();
     box.innerHTML=CLRS.map(function(c){return clBtn(c[1],'data-clwv="1"',cur);}).join('');
     var pk=czp.querySelector('[data-clx="whole"]');if(pk&&fvHex(cur))pk.value=cur;
   }
   function clParts(list){
     var box=czp.querySelector('[data-clparts]');if(!box)return;
-    var d=D(),names=list||Object.keys(st.partInfo||{}),pc=d.pc||{},cur=body();
+    var d=host._d,names=list||Object.keys(st.partInfo||{}),pc=d.pc||{},cur=bodyHex();
     if(!names.length){box.innerHTML='';return;}
     if(names.length<2){box.innerHTML='<div class="hint">هذا الصنف قطعة واحدة — استخدم «لون الصنف كاملاً».</div>';return;}
     box.innerHTML=names.map(function(n){
@@ -7163,16 +7163,16 @@ function fvMount(host,d,name){
     }).join('');
   }
   function clSetPart(n,h,keep){
-    var d=D();
+    var d=host._d;
     if(h){(d.pc||(d.pc={}))[n]=h;}else if(d.pc){delete d.pc[n];}
     kick();fire();schedSave();if(!keep)clParts();
   }
   function clSetWhole(h){
-    var d=D();st.cc=h;st.set=true;d.cc=h;d.fin='';
+    var d=host._d;st.cc=h;st.set=true;d.cc=h;d.fin='';
     var s0=host.querySelector('select[data-f="col"]');if(s0)s0.value='';
-    sync();kick();fire();schedSave();
+    syncChips();kick();fire();schedSave();
   }
-  host._clr=function(){clWhole();clParts();var cf=czp.querySelector('[data-clx="cfab"]');if(cf)cf.checked=!!D().cfab;};
+  host._clr=function(){clWhole();clParts();var cf=czp.querySelector('[data-clx="cfab"]');if(cf)cf.checked=!!host._d.cfab;};
   czp.addEventListener('click',function(e){
     var b=e.target.closest('button[data-clwv],button[data-clp],button[data-clreset]');if(!b||!czp.contains(b))return;
     if(b.dataset.clwv!==undefined){clSetWhole(b.dataset.v);return;}
@@ -7186,7 +7186,7 @@ function fvMount(host,d,name){
   });
   czp.addEventListener('change',function(e){
     var t=e.target;if(!t||!t.dataset)return;
-    if(t.dataset.clx==='cfab'){D().cfab=!!t.checked;kick();fire();schedSave();}
+    if(t.dataset.clx==='cfab'){host._d.cfab=!!t.checked;kick();fire();schedSave();}
     else if(t.dataset.clpick!==undefined)clParts();
   });
   st.partSig='';st.onParts=function(l){mvRefresh(l);clParts(l);};st.onSel=function(){mvRefresh();};clWhole();clParts();
