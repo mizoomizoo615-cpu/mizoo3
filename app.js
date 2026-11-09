@@ -1413,7 +1413,7 @@ function pcCompute(){
   var c=pcCfg(),L=num(c.L),W=num(c.W),kerf=Math.max(0,num(c.kerf))/10,trim=Math.max(0,num(c.trim));
   var aw=L-2*trim,ah=W-2*trim,units=Math.max(1,Math.floor(num(c.units))||1);
   var r={L:L,W:W,aw:aw,ah:ah,trim:trim,kerf:kerf,units:units,legend:[],lmap:{},bad:[],sheets:[],used:0,err:''};
-  if(!(L>0&&W>0)){r.err='أدخل مقاس اللوح (الطول والعرض).';return r;}
+  if(!(L>0&&W>0)){r.err='أدخل مقاس اللوح (العرض والعمق).';return r;}
   if(!(aw>0&&ah>0)){r.err='التشذيب أكبر من مقاس اللوح.';return r;}
   var items=[];
   c.pieces.forEach(function(p,i){
@@ -1472,7 +1472,7 @@ function renderPcResult(){
   wn.innerHTML='';kp.innerHTML='';ly.innerHTML='';lg.innerHTML='';
   if(r.err){wn.innerHTML='<div class="note bad">'+esc(r.err)+'</div>';return;}
   if(r.bad.length)wn.innerHTML='<div class="note bad">قطع أكبر من اللوح المتاح ولا يمكن قصها: '+r.bad.map(function(x){return esc(x.n)+' ('+pcN(x.l)+'×'+pcN(x.w)+')';}).join('، ')+'. غيّر مقاس اللوح أو قسّم القطعة.</div>';
-  if(!r.legend.length){ly.innerHTML='<div class="empty" style="padding:14px">أدخل قطع الصنف (الطول والعرض والعدد) لتظهر النتيجة.</div>';return;}
+  if(!r.legend.length){ly.innerHTML='<div class="empty" style="padding:14px">أدخل قطع الصنف (العرض والعمق والعدد) لتظهر النتيجة.</div>';return;}
   var res=num(c.reserve),buy=(n&&res>0)?Math.ceil(n*(1+res/100)-1e-9):n;
   var util=n?r.used/(n*r.L*r.W):0,m=matBy(c.mat),price=m?num(m.price):0;
   var k='<div class="kpi t"><b>'+n+'</b><span>لوح مطلوب حسب مخطط القص</span></div>';
@@ -1488,7 +1488,7 @@ function renderPcResult(){
   kp.innerHTML=k;
   var placed={};r.sheets.forEach(function(s){s.items.forEach(function(it){placed[it.id]=(placed[it.id]||0)+1;});});
   ly.innerHTML=r.sheets.map(function(s,i){return '<div class="pcard2"><div class="pch"><b>لوح '+(i+1)+'</b><span>استغلال '+Math.round(s.area/(r.L*r.W)*100)+'%</span></div>'+pcSvg(s,r)+'<small>'+s.items.length+' قطعة</small></div>';}).join('');
-  lg.innerHTML='<thead><tr><th>م</th><th>القطعة</th><th>الطول</th><th>العرض</th><th>العدد الكلي</th><th>الموضوع</th><th>العرق</th></tr></thead><tbody>'+
+  lg.innerHTML='<thead><tr><th>م</th><th>القطعة</th><th>العرض</th><th>العمق</th><th>العدد الكلي</th><th>الموضوع</th><th>العرق</th></tr></thead><tbody>'+
     r.legend.map(function(x){return '<tr><td class="num"><span class="pcsw" style="background:'+x.col+'"></span>'+x.id+'</td><td>'+esc(x.n)+'</td><td class="num">'+pcN(x.l)+'</td><td class="num">'+pcN(x.w)+'</td><td class="num">'+x.q+'</td><td class="num">'+(placed[x.id]||0)+'</td><td>'+(x.lock?'ثابت':'يجوز التدوير')+'</td></tr>';}).join('')+'</tbody>';
 }
 function renderPanelCalc(){renderPcInputs();renderPcResult();}
@@ -1498,7 +1498,7 @@ function pcPrintSheet(){
   var n=r.sheets.length,util=r.used/(n*r.L*r.W),m=matBy(c.mat);
   openSheet('<h2>مخطط قص الألواح</h2>'+
     kv([['تاريخ الطباعة',today(),'مقاس اللوح',pcN(r.L)+' × '+pcN(r.W)+' سم'],['عدد الألواح',n,'نسبة الاستغلال',Math.round(util*100)+'%'],['سمك الشفرة',pcN(r.kerf*10)+' مم','عدد وحدات الصنف',r.units],['خامة اللوح',m?matLabel(m):'—','السمك',c.th?c.th+' مم':'—']])+
-    '<table><thead><tr><th>م</th><th>القطعة</th><th>الطول</th><th>العرض</th><th>العدد</th><th>العرق</th></tr></thead><tbody>'+
+    '<table><thead><tr><th>م</th><th>القطعة</th><th>العرض</th><th>العمق</th><th>العدد</th><th>العرق</th></tr></thead><tbody>'+
     r.legend.map(function(x){return '<tr><td>'+x.id+'</td><td>'+esc(x.n)+'</td><td>'+pcN(x.l)+'</td><td>'+pcN(x.w)+'</td><td>'+x.q+'</td><td>'+(x.lock?'ثابت':'يجوز التدوير')+'</td></tr>';}).join('')+'</tbody></table>'+
     r.sheets.map(function(s,i){return '<div style="display:inline-block;width:48%;margin:1%;vertical-align:top;page-break-inside:avoid"><b>لوح '+(i+1)+'</b> — استغلال '+Math.round(s.area/(r.L*r.W)*100)+'%'+pcSvg(s,r)+'</div>';}).join('')+
     sigs(['النجار','مدير الإنتاج']));
@@ -2409,7 +2409,7 @@ function parseSize(s){
 }
 function isoSvg(L,W,H){
   L=num(L);W=num(W);H=num(H);
-  if(L<=0||W<=0||H<=0)return '<div class="empty" style="padding:24px 10px">أدخل الطول والعرض والارتفاع لعرض المجسم ثلاثي الأبعاد</div>';
+  if(L<=0||W<=0||H<=0)return '<div class="empty" style="padding:24px 10px">أدخل العرض والعمق والارتفاع لعرض المجسم ثلاثي الأبعاد</div>';
   var s=140/Math.max(L,W,H),c=0.866;
   function P(x,y,z){return [(x-y)*c*s,(x+y)*0.5*s-z*s];}
   var cs=[[0,0,0],[L,0,0],[0,W,0],[L,W,0],[0,0,H],[L,0,H],[0,W,H],[L,W,H]].map(function(a){return P(a[0],a[1],a[2]);});
@@ -2424,8 +2424,8 @@ function isoSvg(L,W,H){
     poly([[0,0,H],[L,0,H],[L,W,H],[0,W,H]],'#f5dcaa')+
     poly([[L,0,0],[L,W,0],[L,W,H],[L,0,H]],'#d9b774')+
     poly([[0,W,0],[L,W,0],[L,W,H],[0,W,H]],'#e8c98c')+
-    T(Q(L/2,W,0),-14,18,'الطول '+fmt(L),'middle')+
-    T(Q(L,W/2,0),14,16,'العرض '+fmt(W),'start')+
+    T(Q(L/2,W,0),-14,18,'العرض '+fmt(L),'middle')+
+    T(Q(L,W/2,0),14,16,'العمق '+fmt(W),'start')+
     T(Q(0,W,H/2),-8,4,'الارتفاع '+fmt(H),'end')+
     '</svg>';
 }
@@ -2527,7 +2527,7 @@ function furnDesc(t,r){
   return 'صندوق بالأبعاد المدخلة';
 }
 function furnSvg(t,L,W,H,r){
-  if(!(L>0&&W>0&&H>0))return '<div class="empty" style="padding:24px 10px">أدخل الطول والعرض والارتفاع لعرض المجسم ثلاثي الأبعاد</div>';
+  if(!(L>0&&W>0&&H>0))return '<div class="empty" style="padding:24px 10px">أدخل العرض والعمق والارتفاع لعرض المجسم ثلاثي الأبعاد</div>';
   var s=140/Math.max(L,W,H),c=0.866;
   function P(x,y,z){return [(x-y)*c*s,(x+y)*0.5*s-z*s];}
   var cs=[[0,0,0],[L,0,0],[0,W,0],[L,W,0],[0,0,H],[L,0,H],[0,W,H],[L,W,H]].map(function(a){return P(a[0],a[1],a[2]);});
@@ -2659,8 +2659,8 @@ function furnSvg(t,L,W,H,r){
   function T(q,dx,dy,tx,anc){return '<text x="'+(q[0]+dx).toFixed(1)+'" y="'+(q[1]+dy).toFixed(1)+'" text-anchor="'+anc+'" font-size="11" font-weight="700" fill="#6c1214">'+esc(tx)+'</text>';}
   return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" style="max-width:100%;height:auto" role="img" aria-label="'+esc('مجسم ثلاثي الأبعاد — '+t)+'">'+
     '<text x="'+(w/2)+'" y="13" text-anchor="middle" font-size="12" font-weight="700" fill="#8e1c1f">'+esc('مجسم: '+t)+'</text>'+out+
-    T(Q(L/2,W,0),-14,18,'الطول '+fmt(L),'middle')+
-    T(Q(L,W/2,0),14,16,'العرض '+fmt(W),'start')+
+    T(Q(L/2,W,0),-14,18,'العرض '+fmt(L),'middle')+
+    T(Q(L,W/2,0),14,16,'العمق '+fmt(W),'start')+
     T(Q(0,W,H/2),-8,4,'الارتفاع '+fmt(H),'end')+'</svg>';
 }
 /* ---------- التقسيم الداخلي (المقطع الداخلي بالأبواب مفتوحة) ---------- */
@@ -2901,7 +2901,7 @@ function interiorSvg(t,L,H,secs,lay,sf){
   }
   var yb=y1+40,xd=x0-12;
   o+=px(X(0),yb,X(L),yb)+px(X(0),yb-4,X(0),yb+4)+px(X(L),yb-4,X(L),yb+4)+
-    '<text x="'+X(L/2).toFixed(1)+'" y="'+(yb+14)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#6c1214">'+esc('الطول '+fmt(L))+'</text>'+
+    '<text x="'+X(L/2).toFixed(1)+'" y="'+(yb+14)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#6c1214">'+esc('العرض '+fmt(L))+'</text>'+
     px(xd,Y(0),xd,Y(H))+px(xd-4,Y(0),xd+4,Y(0))+px(xd-4,Y(H),xd+4,Y(H))+
     '<text transform="rotate(-90 '+(xd-7)+' '+((Y(0)+Y(H))/2).toFixed(1)+')" x="'+(xd-7)+'" y="'+((Y(0)+Y(H))/2).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#6c1214">'+esc('الارتفاع '+fmt(H))+'</text>';
   return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" style="max-width:100%;height:auto" role="img" aria-label="المقطع الداخلي">'+
@@ -3034,7 +3034,7 @@ function secEditor0(k,d,name){
   var t=ftype(d,name);if(!hasInt(t))return '';
   var h='<div style="margin-top:12px"><b>التقسيم الداخلي</b> <span class="hint">— الأقسام مرتبة من اليسار إلى اليمين كما في رسم المقطع الداخلي، وترك العرض فارغًا يوزّع المتبقي بالتساوي</span>';
   if(!d.secs||!d.secs.length){
-    return h+'<p class="hint">يستخدم الرسم الآن تقسيمًا مقترحًا حسب النوع والطول. اضغط «تخصيص التقسيم» لتحديد عدد الأقسام ونوع كل قسم وعدد الرفوف.</p><div class="bar"><button class="btn ghost sm" type="button" data-a="secdef" data-sk="'+k+'">تخصيص التقسيم</button><button class="btn gold sm" type="button" data-a="secmixnew" data-sk="'+k+'">🧩 تقسيم حسب طلب العميل (رفوف + شماعة + أدراج بنفس الفتحة)</button></div></div>';
+    return h+'<p class="hint">يستخدم الرسم الآن تقسيمًا مقترحًا حسب النوع والعرض. اضغط «تخصيص التقسيم» لتحديد عدد الأقسام ونوع كل قسم وعدد الرفوف.</p><div class="bar"><button class="btn ghost sm" type="button" data-a="secdef" data-sk="'+k+'">تخصيص التقسيم</button><button class="btn gold sm" type="button" data-a="secmixnew" data-sk="'+k+'">🧩 تقسيم حسب طلب العميل (رفوف + شماعة + أدراج بنفس الفتحة)</button></div></div>';
   }
   d.secs.forEach(function(sc,i){
     var kd=sc.k||'shelves',a='data-sec="'+k+'" data-si="'+i+'"';
@@ -3053,9 +3053,9 @@ function scDraw(d,name){
   var t=ftype(d,name),L=num(d.l),W=num(d.w),H=num(d.h),r=fdef(t,d,L),ok=L>0&&W>0&&H>0;
   var secs=(ok&&hasInt(t))?getSecs(d,t,L,r):null,lay=secs?secLayout(secs,L,H):null;
   return '<div class="scviews">'+furnSvg(t,L,W,H,r)+
-    rectSvg(d.l,d.h,'الطول','الارتفاع','الواجهة الأمامية',frontPlan(t,r))+
-    rectSvg(d.w,d.h,'العرض','الارتفاع','الواجهة الجانبية')+
-    rectSvg(d.l,d.w,'الطول','العرض','المسقط الأفقي')+
+    rectSvg(d.l,d.h,'العرض','الارتفاع','الواجهة الأمامية',frontPlan(t,r))+
+    rectSvg(d.w,d.h,'العمق','الارتفاع','الواجهة الجانبية')+
+    rectSvg(d.l,d.w,'العرض','العمق','المسقط الأفقي')+
     (lay?interiorSvg(t,L,H,secs,lay,d.sf):'')+'</div>'+
     (ok?'<div class="scdet"><b>تفاصيل المجسم:</b> '+esc(t)+' — '+esc(furnDesc(t,r))+
       (lay?'<br><b>التقسيم الداخلي (من اليسار):</b> '+esc(secDesc(secs,lay))+(lay.note?'<br><b>تنبيه:</b> '+esc(lay.note):''):'')+'</div>':'');
@@ -3099,7 +3099,7 @@ function renderScope(){
     function f(key,lab){return '<div><label>'+lab+'</label><input type="number" min="0" step="any" data-sk="'+k+'" data-k="'+key+'" value="'+esc(d[key])+'"></div>';}
     h+='<div class="card"><h2>'+esc(u.name)+' <small>— الكمية '+fmt(u.qty)+'</small></h2>'+
       (ref?'<p class="hint">المقاس المسجل في الطلب: '+esc(ref)+(u.p&&u.p.color?' — '+esc(u.p.color):'')+'</p>':'')+
-      '<div class="grid">'+f('l','الطول (سم)')+f('w','العرض (سم)')+f('h','الارتفاع (سم)')+
+      '<div class="grid">'+f('l','العرض (سم)')+f('w','العمق (سم)')+f('h','الارتفاع (سم)')+
       '<div class="wide"><label>نوع الأثاث (يحدد شكل المجسم)</label><select data-sk="'+k+'" data-k="type">'+FT.map(function(x){return '<option'+(x===ftype(d,u.name)?' selected':'')+'>'+x+'</option>';}).join('')+'</select></div>'+
       g('doors','عدد الأبواب')+g('drawers','عدد الأدراج')+g('shelves','أرفف / وسائد')+
       '<div class="wide"><label>ملاحظات (سماكة، فتحات، تفاصيل)</label><input data-sk="'+k+'" data-k="note" value="'+esc(d.note)+'"></div></div>'+doorEditor(k,d,u.name)+secEditor(k,d,u.name)+catSlots(k,d)+cimgSlots(k,d)+galSlots(k,d)+
@@ -3578,7 +3578,7 @@ function planSelHtml(o){
 function planBoxHtml(o){
   var sc=getScope(o.id),us=planUnits(o),p=getPlan(sc,us),op=p.opts[p.cur];
   return '<h2>🧩 مخطط توزيع الأصناف في الغرفة — خيارات للعميل</h2>'+
-    '<p class="hint">اسحب أي صنف لتغيير مكانه داخل الغرفة (مثلًا نقل الدولاب من حائط إلى آخر)، وأنشئ خيارًا جديدًا لكل توزيع تقترحه، ثم اضغط «عرض للعميل» لينتقل الصنف بحركة بين الخيارات. الأبعاد مأخوذة من بطاقة كل صنف أعلاه (الطول × العرض)، والخط الغامق أسفل كل صنف يمثل واجهته.</p>'+
+    '<p class="hint">اسحب أي صنف لتغيير مكانه داخل الغرفة (مثلًا نقل الدولاب من حائط إلى آخر)، وأنشئ خيارًا جديدًا لكل توزيع تقترحه، ثم اضغط «عرض للعميل» لينتقل الصنف بحركة بين الخيارات. الأبعاد مأخوذة من بطاقة كل صنف أعلاه (العرض × العمق)، والخط الغامق أسفل كل صنف يمثل واجهته.</p>'+
     '<div class="grid"><div><label>عرض الغرفة (سم)</label><input type="number" min="100" step="10" data-pl="rw" value="'+esc(p.rw)+'"></div>'+
     '<div><label>عمق الغرفة (سم)</label><input type="number" min="100" step="10" data-pl="rl" value="'+esc(p.rl)+'"></div>'+
     '<div><label style="display:flex;gap:6px;align-items:center;margin-top:24px"><input type="checkbox" data-pl="snap"'+(p.snap?' checked':'')+' style="width:auto"> محاذاة لأقرب 5 سم</label></div></div>'+
@@ -4548,7 +4548,7 @@ function xfRenderProds(){
     var pS=xfPcs(p,'sent'),pR=xfPcs(p,'recv'),nc=(p.cuts||[]).length;
     var cuts='';
     if(p.open&&nc){
-      cuts='<div class="scroll" style="margin-top:8px"><table class="rec mt"><thead><tr><th>م</th><th style="min-width:150px">القطعة</th><th>الطول (سم)</th><th>العرض (سم)</th><th>السماكة (مم)</th><th>العدد للوحدة</th><th>المرسل</th><th>المستلم</th><th>الفرق</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+
+      cuts='<div class="scroll" style="margin-top:8px"><table class="rec mt"><thead><tr><th>م</th><th style="min-width:150px">القطعة</th><th>العرض (سم)</th><th>العمق (سم)</th><th>السماكة (مم)</th><th>العدد للوحدة</th><th>المرسل</th><th>المستلم</th><th>الفرق</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+
         p.cuts.map(function(c,j){
           function g(k,type){return '<td><input data-p="'+i+'" data-c="'+j+'" data-k="'+k+'" type="'+type+'"'+(type==='number'?' step="any" min="0" style="width:84px"':'')+' value="'+esc(c[k]==null?'':c[k])+'"></td>';}
           var df=xfDfV(c.recv,c.sent);
@@ -4564,7 +4564,7 @@ function xfRenderProds(){
       '<button class="btn sm red" data-a="xfpdel" data-p="'+i+'" type="button" aria-label="حذف الصنف">×</button></div></div>'+
       '<div class="grid">'+f('name','اسم الصنف','text','wide')+
       '<div><label>نوع الأثاث</label><select data-p="'+i+'" data-k="type">'+FT.map(function(x){return '<option'+(x===ty?' selected':'')+'>'+x+'</option>';}).join('')+'</select></div>'+
-      f('l','الطول (سم)','number')+f('w','العرض (سم)','number')+f('h','الارتفاع (سم)','number')+
+      f('l','العرض (سم)','number')+f('w','العمق (سم)','number')+f('h','الارتفاع (سم)','number')+
       f('doors','عدد الأبواب','number')+f('drawers','عدد الأدراج','number')+f('shelves','عدد الرفوف','number')+
       f('color','اللون / التشطيب','text')+
       f('sent','الكمية المرسلة (صنف)','number')+f('recv','المستلمة فعليًا (صنف)','number')+
@@ -4642,7 +4642,7 @@ function xfPrintDetails(d){
       }).join('')+'</tbody></table>';
     ps.forEach(function(p){
       if(!(p.cuts||[]).length)return;
-      h+='<div class="brk"><h3 style="margin:12px 0 4px">قائمة القطع — '+esc(p.name)+' (عدد '+fmt(num(p.sent))+')</h3><table><thead><tr><th>م</th><th>القطعة</th><th>الطول (سم)</th><th>العرض (سم)</th><th>السماكة (مم)</th><th>العدد للوحدة</th><th>المرسل</th><th>المستلم</th><th>الفرق</th><th>ملاحظة</th></tr></thead><tbody>'+
+      h+='<div class="brk"><h3 style="margin:12px 0 4px">قائمة القطع — '+esc(p.name)+' (عدد '+fmt(num(p.sent))+')</h3><table><thead><tr><th>م</th><th>القطعة</th><th>العرض (سم)</th><th>العمق (سم)</th><th>السماكة (مم)</th><th>العدد للوحدة</th><th>المرسل</th><th>المستلم</th><th>الفرق</th><th>ملاحظة</th></tr></thead><tbody>'+
         p.cuts.map(function(k,j){return '<tr><td>'+(j+1)+'</td><td>'+esc(k.name)+'</td><td>'+fmt(num(k.l))+'</td><td>'+fmt(num(k.w))+'</td><td>'+fmt(num(k.t))+'</td><td>'+fmt(num(k.per))+'</td><td>'+fmt(num(k.sent))+'</td><td>'+(c?fmt(num(k.recv)):'')+'</td><td>'+(c?fmt(num(k.recv)-num(k.sent)):'')+'</td><td>'+esc(k.note)+'</td></tr>';}).join('')+
         '<tr><td colspan="6"><b>إجمالي القطع</b></td><td><b>'+fmt(xfPcs(p,'sent'))+'</b></td><td><b>'+(c?fmt(xfPcs(p,'recv')):'')+'</b></td><td><b>'+(c?fmt(xfPcs(p,'recv')-xfPcs(p,'sent')):'')+'</b></td><td></td></tr></tbody></table></div>';
     });
@@ -4684,7 +4684,7 @@ function renderXfPieces(){
   xfPcFill('xpTo','<option value="">الكل</option>'+dopts(null,false).replace('<option value="">— اختر —</option>',''));
   var by=$('xpBy').checked,rows=xfPcRows(),ts=0,tr=0,tp=0;
   $('xfPcTbl').innerHTML=rows.length?
-    '<thead><tr><th>م</th><th>القطعة</th><th>الطول (سم)</th><th>العرض (سم)</th><th>السماكة (مم)</th><th>العدد المرسل</th><th>المستلم</th><th>بانتظار الاستلام</th><th>المسار</th>'+(by?'<th>الطلب</th>':'<th>الطلبات</th>')+'<th>من الأصناف</th></tr></thead><tbody>'+
+    '<thead><tr><th>م</th><th>القطعة</th><th>العرض (سم)</th><th>العمق (سم)</th><th>السماكة (مم)</th><th>العدد المرسل</th><th>المستلم</th><th>بانتظار الاستلام</th><th>المسار</th>'+(by?'<th>الطلب</th>':'<th>الطلبات</th>')+'<th>من الأصناف</th></tr></thead><tbody>'+
     rows.map(function(r,i){
       ts+=r.sent;tr+=r.recv;tp+=r.pend;
       return '<tr><td>'+(i+1)+'</td><td><b>'+esc(r.name)+'</b></td><td class="num">'+fmt(r.l)+'</td><td class="num">'+fmt(r.w)+'</td><td class="num">'+(r.t||'')+'</td><td class="num"><b>'+fmt(r.sent)+'</b></td><td class="num">'+fmt(r.recv)+'</td><td class="num">'+(r.pend?fmt(r.pend):'')+'</td><td>'+esc(Object.keys(r.routes).join('، '))+'</td><td>'+esc(Object.keys(r.ords).join('، '))+'</td><td>'+esc(Object.keys(r.prods).join('، '))+'</td></tr>';
@@ -4695,7 +4695,7 @@ function renderXfPieces(){
 function csvXfPieces(){
   var rows=xfPcRows();if(!rows.length){toast('لا توجد قطع للتصدير');return;}
   function q(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
-  var out=[['القطعة','الطول (سم)','العرض (سم)','السماكة (مم)','العدد المرسل','المستلم','بانتظار الاستلام','المسار','الطلبات','من الأصناف'].map(q).join(',')];
+  var out=[['القطعة','العرض (سم)','العمق (سم)','السماكة (مم)','العدد المرسل','المستلم','بانتظار الاستلام','المسار','الطلبات','من الأصناف'].map(q).join(',')];
   rows.forEach(function(r){out.push([r.name,r.l,r.w,r.t,r.sent,r.recv,r.pend,Object.keys(r.routes).join(' | '),Object.keys(r.ords).join(' | '),Object.keys(r.prods).join(' | ')].map(q).join(','));});
   var b=new Blob(['\ufeff'+out.join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
   a.href=URL.createObjectURL(b);a.download='pieces-summary-'+today()+'.csv';document.body.appendChild(a);a.click();
@@ -4708,7 +4708,7 @@ function printXfPieces(){
   if($('xpFrom').value)fl.push('من قسم',dname($('xpFrom').value));
   if($('xpTo').value)fl.push('إلى قسم',dname($('xpTo').value));
   openSheet('<h2>ملخص القطع المحوّلة بين الأقسام بمقاساتها</h2>'+(fl.length?kv([fl]):'')+
-    '<table><thead><tr><th>م</th><th>القطعة</th><th>الطول (سم)</th><th>العرض (سم)</th><th>السماكة (مم)</th><th>المرسل</th><th>المستلم</th><th>المسار</th><th>الطلبات</th></tr></thead><tbody>'+
+    '<table><thead><tr><th>م</th><th>القطعة</th><th>العرض (سم)</th><th>العمق (سم)</th><th>السماكة (مم)</th><th>المرسل</th><th>المستلم</th><th>المسار</th><th>الطلبات</th></tr></thead><tbody>'+
     rows.map(function(r,i){ts+=r.sent;tr+=r.recv;return '<tr><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td><td>'+fmt(r.l)+'</td><td>'+fmt(r.w)+'</td><td>'+(r.t||'')+'</td><td>'+fmt(r.sent)+'</td><td>'+fmt(r.recv)+'</td><td>'+esc(Object.keys(r.routes).join('، '))+'</td><td>'+esc(Object.keys(r.ords).join('، '))+'</td></tr>';}).join('')+
     '<tr><td colspan="5"><b>الإجمالي</b></td><td><b>'+fmt(ts)+'</b></td><td><b>'+fmt(tr)+'</b></td><td colspan="2"></td></tr></tbody></table>'+
     sigs(['مسؤول القص','مسؤول التجميع','مدير الإنتاج']));
@@ -5112,6 +5112,29 @@ function fvBed(a,L,W,H,C){
     if(fvL(C,'bs'))fvB(a,hb+4,4,0.1,bl-8,W-8,0.5,C.LC.c,{em:1,lt:{r:Math.max(L,W)*0.3,a:0.4,fl:1,pt:1}});
   }
 }
+function fvLum(c){return 0.299*c[0]+0.587*c[1]+0.114*c[2];}
+/* لون الصنف كاملاً (يشمل القماش اختيارياً) + ألوان القطع المنفصلة: تحافظ على تدرج الظلال بين الألواح */
+function fvPartColors(a,oo,F,C){
+  var pc=oo.pc||null,keys=pc?Object.keys(pc):[],fabOn=!!oo.cfab||F.m==='fabric',lb=Math.max(fvLum(F),1);
+  if(oo.cfab&&F.m!=='fabric'){
+    a.forEach(function(b){
+      if(b.mt!=='fabric'||!b.c)return;
+      if(b.c===C.up&&fvHex(oo.upc))return;
+      if(b.al&&b.al<1)return;
+      var c=fvMix(b.c,F,0.9);c.m='fabric';b.c=c;
+    });
+  }
+  keys.forEach(function(k){
+    var nc=fvHex(pc[k]);if(!nc)return;
+    a.forEach(function(b){
+      if(b.part!==k||!b.c)return;
+      var m=b.mt||b.c.m||'';
+      if(!(m==='wood'||(m==='fabric'&&fabOn)))return;
+      var r=Math.max(0.35,Math.min(1.35,fvLum(b.c)/lb)),c=[fvClamp(nc[0]*r),fvClamp(nc[1]*r),fvClamp(nc[2]*r)];
+      c.m=m;b.c=c;
+    });
+  });
+}
 function fvBuild(S,st){
   var a=[],t=S.t,L=S.L,W=S.W,H=S.H,r=S.r,open=st.open||0,F=(st.cc&&fvHex(st.cc))||FVFIN[st.ci||0][1],tmp,i,lg,th;
   F=F.slice();F.m=(t===FT[7]||t===FT[8]||t===FT[17]||t===FT[18])?'fabric':'wood';
@@ -5240,6 +5263,7 @@ function fvBuild(S,st){
     for(i3=1;i3<n3;i3++)sub3.forEach(function(b){var c3=fvCloneBox(b);fvShift([c3],i3*fvN(o3.dx,0),i3*fvN(o3.dy,0),i3*fvN(o3.dz,0));a.push(c3);});
   });
   var G=oo.gr;if(G&&G.on&&fvHex(G.c2))fvGradient(a,C,F,fvHex(G.c2),G.dir||'h');
+  fvPartColors(a,oo,F,C);
   return a;
 }
 function fvDresserBody(a,L,W,H,nd,C,open){
@@ -5491,8 +5515,8 @@ function fvPolys(S,boxes,st,w,h){
     segs.push([A[0],A[1],B[0],B[1]]);labels.push({x:M[0],y:M[1],t:txt});
   }
   var ox=mn[0],oy=mn[1];
-  dim(ox,oy-off,fz,ox+S.L,oy-off,fz,'الطول '+fmt(S.L));
-  dim(mx[0]+off,oy,fz,mx[0]+off,oy+S.W,fz,'العرض '+fmt(S.W));
+  dim(ox,oy-off,fz,ox+S.L,oy-off,fz,'العرض '+fmt(S.L));
+  dim(mx[0]+off,oy,fz,mx[0]+off,oy+S.W,fz,'العمق '+fmt(S.W));
   dim(ox-off,oy-off,fz,ox-off,oy-off,fz+S.H,'الارتفاع '+fmt(S.H));
   return {polys:polys,glows:glows,floor:floor,shadow:shadow,segs:segs,labels:labels,proj:P2,cc:[cx,cy,cz,R]};
 }
@@ -5803,7 +5827,7 @@ function fvPaint(ctx,w,h,S,st){
   if(GLM)ctx.clearRect(0,0,w,h);else{ctx.fillStyle=g;ctx.fillRect(0,0,w,h);}
   if(!S){
     ctx.fillStyle='#76696a';ctx.font='15px Tahoma,sans-serif';ctx.textAlign='center';
-    ctx.fillText('أدخل الطول والعرض والارتفاع لعرض المجسم ثلاثي الأبعاد',w/2,h/2);return;
+    ctx.fillText('أدخل العرض والعمق والارتفاع لعرض المجسم ثلاثي الأبعاد',w/2,h/2);return;
   }
   var boxes=fvBuild(S,st),R=fvPolys(S,boxes,st,w,h);
   st.lastR=R;
@@ -6730,7 +6754,7 @@ function fvExtHtml(d,name){
   h+=csec('تحريك القطع والعدد',fvMvPanel(d));
   h+=csec('تصميم مخصص (ستوديو)',custHtml(d),'صمّم أي قطعة: ارفع مخططًا أو ارسمها بنفسك');
   h+=gH;
-  if(isD)h+='<div class="hint" style="margin:-4px 0 8px">الملحق الجانبي يُحتسب ضمن الطول الكلي للتسريحة. «جانب الأدراج» يعمل مع تصميم «مكان للكرسي + أدراج على جانب واحد».</div>';
+  if(isD)h+='<div class="hint" style="margin:-4px 0 8px">الملحق الجانبي يُحتسب ضمن العرض الكلي للتسريحة. «جانب الأدراج» يعمل مع تصميم «مكان للكرسي + أدراج على جانب واحد».</div>';
   if(isW){
     var sf0=d.sf||{};
     h+='<div class="fvsec fvsf"><b>خزنة سرية داخل الدولاب</b> <span class="hint">— تُخفى خلف لوح يُفتح مع الأبواب ويظهر شكلها في الرسم عند فتح الدولاب</span>'+
@@ -6840,6 +6864,12 @@ function fvExtInit(host,st,czp,kick,fire,sync){
 function fvPanelHtml0(d,name){
   var gl=d.gl||{},sel=function(v,x){return v===x?' selected':'';},dr=fvTypeDoors(d,name);
   return '<div class="fvcz"><div class="fvsec"><b>الألوان والمقابض</b> <span class="hint">— اضغط على أي لون لفتح كاتلوج الصور</span>'+
+    '<div class="fvsub clrwhole"><span>لون الصنف كاملاً</span><div class="clw" data-clw></div>'+
+      '<div class="czrow"><label>لون مخصص <input type="color" data-clx="whole" value="#ffffff" aria-label="لون الصنف كاملاً"></label>'+
+      '<label><input type="checkbox" data-clx="cfab"'+(d.cfab?' checked':'')+'> تطبيق على التنجيد والقماش أيضاً (المراتب والوسائد)</label></div>'+
+      '<div class="hint">يُطبَّق على كل مكونات الصنف — في غرفة النوم: السرير والدولاب والتسريحة والكومدينو</div></div>'+
+    '<div class="fvsub clrparts"><span>ألوان القطع</span><div data-clparts></div>'+
+      '<div class="hint">اختر لوناً مختلفاً لأي قطعة، وزر «لون الصنف» يعيدها للون الكامل</div></div>'+
     '<div class="czrow">'+
       [['body','لون الجسم والأبواب'],['handle','لون المقابض'],['drawer','لون واجهات الأدراج'],['base','لون القاعدة والإطارات']].map(function(x){return '<button type="button" class="czbtn" data-cz="'+x[0]+'"><i></i>'+x[1]+(d.czs&&d.czs[x[0]]?' <small>— '+esc(d.czs[x[0]].n)+'</small>':'')+'</button>';}).join('')+
       '<button type="button" class="btn ghost sm" data-cz="reset">إعادة الألوان</button></div>'+
@@ -6905,7 +6935,7 @@ function fvMount(host,d,name){
       var k=b.dataset.cz,cz=host._d.cz||{},set=k==='body'?(st.set):!!cz[k];
       b.querySelector('i').style.background=curHex(k);b.style.borderStyle=set?'solid':'dashed';
     });
-    var cc=host.querySelector('input[data-f="cc"]');if(cc)cc.value=bodyHex();if(host._grp)host._grp();
+    var cc=host.querySelector('input[data-f="cc"]');if(cc)cc.value=bodyHex();if(host._grp)host._grp();if(host._clr)host._clr();
   }
   host._sync=syncChips;syncChips();fvExtInit(host,st,czp,kick,fire,syncChips);
   (function(){
@@ -6930,7 +6960,7 @@ function fvMount(host,d,name){
   czp.addEventListener('click',function(e){
     var b=e.target.closest('button[data-cz]');if(!b)return;
     var k=b.dataset.cz,d2=host._d;
-    if(k==='reset'){d2.cc='';d2.fin='';d2.cz={};d2.czs={};d2.gr=null;st.cc=null;st.ci=0;st.set=false;fvDefState(host,d2);syncChips();kick();fire();return;}
+    if(k==='reset'){d2.cc='';d2.fin='';d2.cz={};d2.czs={};d2.gr=null;d2.pc={};d2.cfab=false;st.cc=null;st.ci=0;st.set=false;fvDefState(host,d2);syncChips();kick();fire();return;}
     var oo=orderBy(scOrderId)||{};
     catOpen({sk:host.dataset.sk,slot:'cz:'+k,cat:k==='handle'?'acc':'wood',multi:false,color:true,title:CZ_LAB[k],item:host.dataset.nm,order:oo.orderNo});
   });
@@ -7115,7 +7145,51 @@ function fvMount(host,d,name){
     }).join('');
     var lab=czp.querySelector('[data-mvsel]');if(lab)lab.textContent=st.sel?('القطعة المحددة: '+fvPartLabel(d,st.sel)):'لم تُحدَّد قطعة — اضغط على قطعة في المجسم أو اخترها من القائمة';
   }
-  st.partSig='';st.onParts=mvRefresh;st.onSel=function(){mvRefresh();};
+  /* ---- لون الصنف كاملاً + ألوان القطع ---- */
+  function clBtn(h,attrs,cur){return '<button type="button" class="clsw'+(h===cur?' on':'')+'" '+attrs+' data-v="'+h+'" style="background:'+h+'" title="'+esc(clrName(h))+' '+h+'" aria-label="'+esc(clrName(h))+'"></button>';}
+  function clWhole(){
+    var box=czp.querySelector('[data-clw]');if(!box)return;var cur=body();
+    box.innerHTML=CLRS.map(function(c){return clBtn(c[1],'data-clwv="1"',cur);}).join('');
+    var pk=czp.querySelector('[data-clx="whole"]');if(pk&&fvHex(cur))pk.value=cur;
+  }
+  function clParts(list){
+    var box=czp.querySelector('[data-clparts]');if(!box)return;
+    var d=D(),names=list||Object.keys(st.partInfo||{}),pc=d.pc||{},cur=body();
+    if(!names.length){box.innerHTML='';return;}
+    if(names.length<2){box.innerHTML='<div class="hint">هذا الصنف قطعة واحدة — استخدم «لون الصنف كاملاً».</div>';return;}
+    box.innerHTML=names.map(function(n){
+      var c=pc[n],has=!!fvHex(c),lb=esc(fvPartLabel(d,n));
+      return '<div class="clrow"><span class="clnm">'+lb+'</span><span class="clw">'+CLRS.map(function(x){return clBtn(x[1],'data-clp="'+esc(n)+'"',has?c:'');}).join('')+'</span><input type="color" data-clpick="'+esc(n)+'" value="'+(has?c:cur)+'" aria-label="لون '+lb+'"><button type="button" class="btn ghost sm" data-clreset="'+esc(n)+'"'+(has?'':' disabled')+'>↺ لون الصنف</button></div>';
+    }).join('');
+  }
+  function clSetPart(n,h,keep){
+    var d=D();
+    if(h){(d.pc||(d.pc={}))[n]=h;}else if(d.pc){delete d.pc[n];}
+    kick();fire();schedSave();if(!keep)clParts();
+  }
+  function clSetWhole(h){
+    var d=D();st.cc=h;st.set=true;d.cc=h;d.fin='';
+    var s0=host.querySelector('select[data-f="col"]');if(s0)s0.value='';
+    sync();kick();fire();schedSave();
+  }
+  host._clr=function(){clWhole();clParts();var cf=czp.querySelector('[data-clx="cfab"]');if(cf)cf.checked=!!D().cfab;};
+  czp.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-clwv],button[data-clp],button[data-clreset]');if(!b||!czp.contains(b))return;
+    if(b.dataset.clwv!==undefined){clSetWhole(b.dataset.v);return;}
+    if(b.dataset.clp!==undefined){clSetPart(b.dataset.clp,b.dataset.v);return;}
+    if(b.dataset.clreset!==undefined)clSetPart(b.dataset.clreset,null);
+  });
+  czp.addEventListener('input',function(e){
+    var t=e.target;if(!t||!t.dataset)return;
+    if(t.dataset.clx==='whole')clSetWhole(t.value);
+    else if(t.dataset.clpick!==undefined)clSetPart(t.dataset.clpick,t.value,true);
+  });
+  czp.addEventListener('change',function(e){
+    var t=e.target;if(!t||!t.dataset)return;
+    if(t.dataset.clx==='cfab'){D().cfab=!!t.checked;kick();fire();schedSave();}
+    else if(t.dataset.clpick!==undefined)clParts();
+  });
+  st.partSig='';st.onParts=function(l){mvRefresh(l);clParts(l);};st.onSel=function(){mvRefresh();};clWhole();clParts();
   if(st.mv)cv.style.cursor='crosshair';
   function hitPart(e){
     var R=st.lastR;if(!R)return null;
@@ -7216,6 +7290,8 @@ function czPrint(d){
   var cz=d.cz||{},gl=d.gl||{},rows=[],body=fvHex(d.cc)?d.cc:(d.fin!==''&&d.fin!=null&&FVFIN[+d.fin]?fvHexOf(FVFIN[+d.fin][1]):'');
   function sw(hex){return fvHex(hex)?'<span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:'+hex+';border:1px solid #555;vertical-align:middle"></span> '+esc(clrName(hex))+' ('+hex+')':'';}
   if(body)rows.push(['لون الجسم والأبواب',sw(body)]);
+  if(d.cfab)rows.push(['تطبيق لون الصنف على التنجيد','نعم']);
+  if(d.pc&&Object.keys(d.pc).some(function(k){return fvHex(d.pc[k]);}))rows.push(['ألوان القطع',Object.keys(d.pc).filter(function(k){return fvHex(d.pc[k]);}).map(function(k){return esc(fvPartLabel(d,k))+': '+sw(d.pc[k]);}).join('<br>')]);
   if(cz.handle)rows.push(['لون المقابض',sw(cz.handle)]);
   if(cz.drawer)rows.push(['لون واجهات الأدراج',sw(cz.drawer)]);
   if(cz.base)rows.push(['لون القاعدة والإطارات',sw(cz.base)]);
@@ -7409,7 +7485,7 @@ function asmPlan(S,d,st){
   steps[0].sub=panels.length+' لوح/قطعة · '+hw.length+' قطعة تجهيز';
   var end=steps[steps.length-1].t1;
   return {S:S,panels:panels,stat:stat,steps:steps,hw:hw,tot:tot,mn:mn,mx:mx,emn:emn,emx:emx,buildEnd:end,total:end+7,
-    dims:'الطول × العرض × الارتفاع: '+fmt(S.L)+' × '+fmt(S.W)+' × '+fmt(S.H)+' سم'};
+    dims:'العرض × العمق × الارتفاع: '+fmt(S.L)+' × '+fmt(S.W)+' × '+fmt(S.H)+' سم'};
 }
 function asmCur(P,T){var c=0,i;for(i=0;i<P.steps.length;i++)if(T>=P.steps[i].t0)c=i;return c;}
 function asmStepEnd(P,i){return i===0?P.steps[0].t1-0.05:P.steps[i].t1-0.02;}
@@ -7558,7 +7634,7 @@ function asmShare(A){
 }
 function asmOpen(host,st){
   var S=fvSpec(host._d,host.dataset.nm);
-  if(!S){toast('أدخل الطول والعرض والارتفاع أولًا');return;}
+  if(!S){toast('أدخل العرض والعمق والارتفاع أولًا');return;}
   var P=asmPlan(S,host._d,st);
   if(!P){toast('تعذّر إنشاء خطوات التركيب لهذا الصنف');return;}
   P.name=host.dataset.nm||'الصنف';
@@ -8515,7 +8591,7 @@ function initNew(){
         var p=parseSize(u.p?u.p.size:u.l.size);
         if(p){d.l=p[0];d.w=p[1];d.h=p[2];n++;}
       });
-      renderScope();renderCycle();toast(n?'تم استخراج أبعاد '+n+' صنف (الطول × العرض × الارتفاع). راجعها مع العميل':'لم يُعثر على مقاسات بصيغة 200×90×76 في الطلب');
+      renderScope();renderCycle();toast(n?'تم استخراج أبعاد '+n+' صنف (العرض × العمق × الارتفاع). راجعها مع العميل':'لم يُعثر على مقاسات بصيغة 200×90×76 في الطلب');
     }
   });
   /* التكلفة */
@@ -8621,7 +8697,7 @@ function initNew(){
     if(a==='xfcutgen'){
       var pg=xfDraft.prods[+b.dataset.p];if(!pg)return;
       var lst=xfCutList(xfSpecOfProd(pg));
-      if(!lst.length){toast('أدخل الطول والعرض والارتفاع ونوع الأثاث أولًا ');return;}
+      if(!lst.length){toast('أدخل العرض والعمق والارتفاع ونوع الأثاث أولًا ');return;}
       pg.cuts=xfMkCuts(lst,pg.sent);pg.open=true;xfRenderProds();toast('تم حساب قائمة القطع من المقاسات');
     }
     if(a==='xfcutadd'){var pa=xfDraft.prods[+b.dataset.p];if(pa){pa.cuts=pa.cuts||[];pa.cuts.push({name:'',l:'',w:'',t:18,per:1,sent:r3(num(pa.sent)),recv:'',note:''});pa.open=true;xfRenderProds();}}
@@ -9326,7 +9402,7 @@ function vdItemHdr(c,L,it,lt,ph,W){
   c.restore();
 }
 function vdPanel0(c,L,it,lp,out){
-  var p=L.panel,P=L.P,sp=it.sp,dims=[['الطول',num(it.d.l)],['العرض',num(it.d.w)],['الارتفاع',num(it.d.h)]];
+  var p=L.panel,P=L.P,sp=it.sp,dims=[['العرض',num(it.d.l)],['العمق',num(it.d.w)],['الارتفاع',num(it.d.h)]];
   var dh=P?112:128,gap=14,dw=(p.w-gap*2)/3;
   c.save();c.globalAlpha=1-out;c.translate(-out*60,0);
   dims.forEach(function(d,i){
